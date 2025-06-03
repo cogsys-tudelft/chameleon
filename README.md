@@ -14,6 +14,8 @@ Chameleon is the first chip carrying out end-to-end FSL and CL with temporal dat
 
 In case you decide to use the Chameleon source code for academic or commercial use, we would appreciate it if you let us know; feedback is welcome.
 
+**Note: the documentation of Chameleon is currently work in progress! Feel free to open an issue if there is something that is unclear.**
+
 ## Directory structure
 
 - [`src/`](src/): RTL (Verilog) source code
