@@ -1,0 +1,101 @@
+[*]
+[*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
+[*] Wed Jun 12 08:37:40 2024
+[*]
+[dumpfile] "/Users/dmjdenblanken/Projects/chameleon/test/sim_build/dump.vcd"
+[dumpfile_mtime] "Sun Jun  2 19:55:49 2024"
+[dumpfile_size] 369383851
+[savefile] "/Users/dmjdenblanken/Projects/chameleon/chameleon/sim/overview.gtkw"
+[timestart] 0
+[size] 1728 1051
+[pos] 1008 1079
+*-29.710073 5277130000 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+[markername] AA
+[markername] BB
+[markername] CC
+[markername] DD
+[markername] EE
+[markername] FF
+[markername] GG
+[markername] HH
+[markername] II
+[markername] JJ
+[markername] KK
+[markername] LL
+[markername] MM
+[markername] NN
+[markername] OO
+[markername] PP
+[markername] QQ
+[markername] RR
+[markername] SS
+[markername] TT
+[markername] UU
+[markername] VV
+[markername] WW
+[markername] XX
+[markername] YY
+[markername] ZZ
+[treeopen] chameleon.
+[sst_width] 253
+[signals_width] 251
+[sst_expanded] 1
+[sst_vpaned_height] 505
+@200
+-SPI
+@28
+[color] 2
+chameleon.SCK
+[color] 2
+chameleon.MISO
+[color] 2
+chameleon.MOSI
+@200
+-Clock and reset
+@28
+[color] 3
+chameleon.clk_ext
+[color] 3
+chameleon.rst_async
+[color] 3
+chameleon.clk_int_div
+@200
+-Input bus
+@29
+[color] 7
+chameleon.in_request
+@28
+[color] 7
+chameleon.out_acknowledge
+@200
+-Output bus
+@28
+[color] 6
+chameleon.in_acknowledge
+[color] 6
+chameleon.out_request
+@200
+-GPIO
+@28
+[color] 2
+chameleon.in_idle
+[color] 2
+chameleon.toggle_processing
+[color] 2
+chameleon.is_new_task
+@200
+-Internals
+@24
+chameleon.state[1:0]
+@200
+-Control signals
+-- PE array control
+@24
+chameleon.pe_array_control_inst.in_activation_address[7:0]
+chameleon.pe_array_control_inst.out_activation_address[7:0]
+chameleon.pe_array_control_inst.weight_address[9:0]
+chameleon.pe_array_control_inst.bias_address[6:0]
+@28
+chameleon.pe_array_control_inst.load_scale_and_bias
+[pattern_trace] 1
+[pattern_trace] 0

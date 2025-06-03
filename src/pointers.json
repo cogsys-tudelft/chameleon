@@ -1,0 +1,29 @@
+{
+    "pointer_sizes_and_names": [
+        [
+            "32'b10011101100001111010000000111000",
+            "douwe",
+            true
+        ],
+        [
+            "WAYS_BIT_WIDTH",
+            "ways_received"
+        ],
+        [
+            "SHOT_BIT_WIDTH",
+            "shots_received"
+        ],
+        [
+            1,
+            "configured_for_few_shot_processing"
+        ],
+        [
+            "WAYS_BIT_WIDTH-FEW_SHOT_SHIFT_BIT_WIDTH",
+            "weight_bias_offset"
+        ],
+        [
+            "FEW_SHOT_SHIFT_BIT_WIDTH",
+            "few_shot_shift_required"
+        ]
+    ]
+}

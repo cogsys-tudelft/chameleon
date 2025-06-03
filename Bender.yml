@@ -1,0 +1,56 @@
+# Package metadata. Required.
+package:
+  # The name of the package. Required.
+  name: chameleon
+
+  # The list of package authors and contributors. Optional.
+  # By convention, authors should be listed in the form shown below.
+  authors: ["Douwe den Blanken <douwedb@gmail.com>"]
+
+dependencies:
+  asic-cells: { git: "git@github.com:cogsys-tudelft/asic-cells.git", rev: main }
+  verilog-array-operations: { git: "git@github.com:V0XNIHILI/verilog-array-operations.git", rev: main }
+
+# Additional workspace configuration. Optional.
+workspace:
+  # Create symlinks to dependencies.
+  # A list of paths at which bender will create a symlink to the checked-out
+  # version of the corresponding package.
+  package_links:
+    deps/asic-cells: asic-cells
+    deps/verilog-array-operations: verilog-array-operations
+
+# Freeze any dependency updates. Optional. False if omitted.
+# Useful for chip packages. Once the chip is in final tapeout mode, and
+# dependency updates would require disastrous amounts of re-verification.
+frozen: false
+
+# List of source files in this package. Optional.
+sources:
+  - target: rtl
+    files:
+      - activation_memory_wrapper.v
+      - argmax_tree.v
+      - bias_memory_wrapper.v
+      - chameleon.sv
+      - config_memory.json
+      - convert_2d_to_1d_array_size.v
+      - few_shot_learning_control.v
+      - flog2.v
+      - fsm.v
+      - global_sram_power_down_controller.v
+      - input_memory.v
+      - managed_activation_memory.v
+      - managed_bias_memory.v
+      - managed_input_memory.v
+      - managed_weight_memory.v
+      - pe.v
+      - pe_array.sv
+      - pe_array_control.sv
+      - pointers.json
+      - serial_parallel_argmax.v
+      - squared_log2_sum_accumulator.v
+      - states.vh
+      - take_lsbs_of_2d_array.v
+      - weight_memory_wrapper.v
+      - wide_flog2.v

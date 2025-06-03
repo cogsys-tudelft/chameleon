@@ -1,0 +1,18 @@
+name: Verible formatting
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: chipsalliance/verible-formatter-action@main
+      with:
+        # Not specyfing the token causes the formatter action to fail entirely.
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        parameters: "--flagfile=.verible-format-flags"
+        fail_on_formatting_suggestions: true
+        files: ./**/*.{v,sv,vh,svh}

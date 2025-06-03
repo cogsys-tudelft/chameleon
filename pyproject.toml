@@ -1,0 +1,45 @@
+[project]
+name = "chameleon"
+version = "0.0.1"
+authors = [
+  { name = "Douwe den Blanken" }
+]
+description = "Python code for Chameleon: a matmul-free TCN accelerator for end-to-end FSL and CL from sequential data"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+keywords = ["accelerator", "compiler", "meta-learning", "edge AI", "edge", "zcu104", "asic", "bridge", "verilog", "systemverilog", "hdl", "hardware", "hardware description language", "hardware design", "asic", "asic design"]
+dependencies = [
+  'numpy',
+  'asic-cells @ git+https://github.com/cogsys-tudelft/asic-cells.git@main',
+  'brevitas_utils @ git+https://github.com/cogsys-tudelft/brevitas_utils.git@main'
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["chameleon"]
+
+[project.optional-dependencies]
+test = [
+    "pytest==7.4.3",
+    "cocotb==1.8.1",
+    "cocotb-test==0.2.4"
+]
+torch = [
+    "torch==2.2.0+cpu",
+    "torchvision==0.17.0+cpu"
+]
+fpga_bridge = [
+  'basic-asic-fpga-bridge @ git+https://github.com/V0XNIHILI/basic-asic-fpga-bridge.git@main'
+]
+
+[project.urls]
+"Homepage" = "https://github.com/V0XNIHILI/chameleon"
+"Bug Tracker" = "https://github.com/V0XNIHILI/chameleon/issues"

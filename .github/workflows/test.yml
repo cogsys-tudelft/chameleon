@@ -1,0 +1,18 @@
+name: CocoTB testing
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: YosysHQ/setup-oss-cad-suite@v3
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11' 
+    - run: pip install -e .[test]
+    - run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+    - run: pytest

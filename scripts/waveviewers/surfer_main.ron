@@ -1,0 +1,3781 @@
+(
+    show_hierarchy: None,
+    show_menu: None,
+    show_ticks: None,
+    show_toolbar: None,
+    show_tooltip: None,
+    show_overview: None,
+    show_statusbar: None,
+    align_names_right: None,
+    show_variable_indices: None,
+    show_variable_direction: None,
+    waves: Some((
+        source: File("/Users/dmjdenblanken/Projects/chameleon/test/sim_build/dump.vcd"),
+        format: Vcd,
+        active_scope: Some((
+            strs: [
+                "chameleon",
+            ],
+        )),
+        displayed_items_order: [
+            (6),
+            (12),
+            (2),
+            (11),
+            (4),
+            (75),
+            (7),
+            (8),
+            (9),
+            (10),
+            (76),
+            (13),
+            (15),
+            (16),
+            (17),
+            (18),
+            (19),
+            (54),
+            (195),
+            (194),
+            (77),
+            (20),
+            (21),
+            (22),
+            (23),
+            (78),
+            (24),
+            (25),
+            (336),
+            (85),
+            (26),
+            (128),
+            (213),
+            (275),
+            (81),
+            (27),
+            (29),
+            (30),
+            (31),
+            (32),
+            (214),
+            (51),
+            (82),
+            (94),
+            (337),
+            (136),
+            (137),
+            (138),
+            (83),
+            (84),
+            (129),
+            (291),
+            (296),
+            (317),
+            (318),
+            (86),
+            (143),
+            (144),
+            (146),
+            (148),
+            (147),
+            (149),
+            (150),
+            (151),
+            (153),
+            (152),
+            (154),
+            (187),
+            (156),
+            (158),
+            (157),
+            (159),
+            (160),
+            (274),
+            (276),
+            (277),
+            (278),
+            (280),
+            (283),
+            (284),
+            (285),
+            (286),
+            (287),
+            (288),
+            (289),
+            (290),
+            (338),
+            (321),
+            (322),
+            (328),
+            (323),
+            (325),
+            (330),
+            (326),
+            (327),
+            (333),
+            (334),
+            (305),
+            (306),
+            (307),
+            (308),
+            (320),
+            (329),
+            (145),
+            (52),
+            (140),
+            (141),
+            (142),
+            (139),
+            (79),
+            (99),
+            (297),
+            (88),
+            (164),
+            (100),
+            (93),
+            (131),
+            (130),
+            (133),
+            (132),
+            (135),
+            (134),
+            (167),
+            (168),
+            (169),
+            (170),
+            (171),
+            (172),
+            (173),
+            (174),
+            (175),
+            (176),
+            (177),
+            (178),
+            (179),
+            (180),
+            (181),
+            (182),
+            (183),
+            (215),
+            (216),
+            (217),
+            (218),
+            (219),
+            (220),
+            (221),
+            (222),
+            (223),
+            (224),
+            (225),
+            (226),
+            (227),
+            (228),
+            (229),
+            (230),
+            (231),
+            (87),
+            (197),
+            (198),
+            (199),
+            (200),
+            (201),
+            (202),
+            (203),
+            (204),
+            (205),
+            (206),
+            (207),
+            (208),
+            (209),
+            (210),
+            (211),
+            (212),
+            (196),
+            (101),
+            (117),
+            (122),
+            (111),
+            (123),
+            (106),
+            (108),
+            (113),
+            (114),
+            (105),
+            (115),
+            (116),
+            (316),
+            (104),
+            (103),
+            (109),
+            (110),
+            (126),
+            (127),
+            (309),
+            (313),
+            (315),
+            (339),
+            (102),
+            (50),
+            (55),
+            (56),
+            (57),
+            (59),
+            (60),
+            (61),
+            (62),
+            (63),
+            (64),
+            (65),
+            (66),
+            (67),
+            (68),
+            (69),
+            (70),
+            (71),
+            (72),
+            (73),
+            (74),
+            (80),
+            (34),
+            (35),
+            (36),
+            (37),
+            (38),
+            (39),
+            (40),
+            (41),
+            (42),
+            (43),
+            (44),
+            (45),
+            (46),
+            (47),
+            (48),
+            (49),
+        ],
+        displayed_items: {
+            (140): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "out_scale",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "out_scale [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (156): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "activation_control_read_enable",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "activation_control_read_enable",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (174): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[6]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[6] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (180): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[12]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[12] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (74): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[15]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[15] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (122): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "in_first_block",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "in_first_block",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (68): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[9]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[9] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (170): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[2]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[2] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (126): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "last_written_address",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "last_written_address [5:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (75): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (200): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[3]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[3] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (339): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "restart_input_memory",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "restart_input_memory",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (154): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "few_shot_learning_control_inst",
+                        ],
+                    ),
+                    name: "which_shot",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "which_shot [4:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (153): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "few_shot_learning_control_inst",
+                        ],
+                    ),
+                    name: "correct_out_address",
+                ),
+                color: Some("gray"),
+                background_color: None,
+                display_name: "correct_out_address",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (212): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[15]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[15] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (62): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[3]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[3] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (307): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "continuous_processing",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "continuous_processing",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (25): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "state",
+                ),
+                color: Some("yellow"),
+                background_color: None,
+                display_name: "state [1:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (217): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[1]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[1] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (285): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "k_shot_division_scale",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "k_shot_division_scale [2:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (136): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                        ],
+                    ),
+                    name: "apply_identity",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "apply_identity",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (148): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "few_shot_learning_control_inst",
+                        ],
+                    ),
+                    name: "shots",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "shots [4:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (71): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[12]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[12] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (152): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "few_shot_learning_control_inst",
+                        ],
+                    ),
+                    name: "in_activation_address_few_shot_corrected",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "in_activation_address_few_shot_corrected [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (142): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "use_scale_and_bias",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "use_scale_and_bias",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (160): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "enable_weight_memory_for_few_shot",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "enable_weight_memory_for_few_shot",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (179): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[11]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[11] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (318): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                            "steps_in_kernel_counter",
+                        ],
+                    ),
+                    name: "[1]",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "…steps_in_kernel_counter.[1] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (143): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Few-shot learning control -----------------------------------------"),
+            )),
+            (151): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "few_shot_learning_control_inst",
+                        ],
+                    ),
+                    name: "out_activation_address_few_shot_corrected",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "out_activation_address_few_shot_corrected [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (64): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[5]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[5] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (111): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "in_last_block_of_input_layer",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "in_last_block_of_input_layer",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (15): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "in_request",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "in_request",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (83): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "processing_residual_part",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "processing_residual_part",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (219): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[3]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[3] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (178): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[10]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[10] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (8): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "SCK",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "SCK",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (291): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "enable_argmax",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "enable_argmax",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (197): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[0]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[0] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (69): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[10]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[10] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (144): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "processing_new_task_samples",
+                ),
+                color: Some("yellow"),
+                background_color: None,
+                display_name: "processing_new_task_samples",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (289): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "use_few_shot_next_layer_blocks",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "use_few_shot_next_layer_blocks",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (138): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                        ],
+                    ),
+                    name: "use_subsection",
+                ),
+                color: Some("yellow"),
+                background_color: None,
+                display_name: "use_subsection",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (321): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (326): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "global_sram_power_down_controller_inst",
+                        ],
+                    ),
+                    name: "power_up_delay_counter",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "power_up_delay_counter [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (205): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[8]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[8] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (327): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "global_sram_power_down_controller_inst",
+                        ],
+                    ),
+                    name: "wake_up_delay_counter",
+                ),
+                color: Some("red"),
+                background_color: None,
+                display_name: "wake_up_delay_counter [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (110): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "oldest_data_address",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "oldest_data_address [5:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (277): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "squared_log2_sum_accumulator_inst",
+                        ],
+                    ),
+                    name: "accumulator",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "accumulator [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (284): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "left_shift_few_shot_scale",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "left_shift_few_shot_scale [2:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (147): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "few_shot_learning_control_inst",
+                        ],
+                    ),
+                    name: "received_all_shots",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "received_all_shots",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (21): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "in_idle",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "in_idle",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (66): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[7]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[7] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (328): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "global_sram_power_down_controller_inst",
+                        ],
+                    ),
+                    name: "should_be_on",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "should_be_on",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (228): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[12]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[12] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (32): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "load_scale_and_bias",
+                ),
+                color: Some("red"),
+                background_color: None,
+                display_name: "load_scale_and_bias",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (80): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (141): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                        ],
+                    ),
+                    name: "apply_bias",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "apply_bias",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (231): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[15]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[15] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (308): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "require_single_chunk",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "require_single_chunk",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (116): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "data_available",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "data_available",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (168): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[0]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[0] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (146): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "shots_received",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "shots_received [4:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (52): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Weights and biases ------------------------------------"),
+            )),
+            (61): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[2]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[2] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (322): Divider((
+                color: None,
+                background_color: None,
+                name: Some("SRAM PD controller -------------------------------"),
+            )),
+            (81): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "layer",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "layer [4:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (204): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[7]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[7] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (286): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "few_shot_learning_control_inst",
+                        ],
+                    ),
+                    name: "linear_layer_blocks",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "linear_layer_blocks [5:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (67): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[8]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[8] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (225): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[9]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[9] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (101): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Input memory ------------------------------------"),
+            )),
+            (65): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[6]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[6] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (223): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[7]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[7] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (117): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "fill_first",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "fill_first",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (226): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[10]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[10] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (177): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[9]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[9] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (320): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "classification",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "classification",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (145): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (72): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[13]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[13] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (133): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Weight row 0 col 15 -----------------------------"),
+            )),
+            (194): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "data_out",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "data_out [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (283): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "right_shift_few_shot_scale",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "right_shift_few_shot_scale [1:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (11): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "clk_int_div",
+                ),
+                color: Some("yellow"),
+                background_color: None,
+                display_name: "clk_int_div",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (230): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[14]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[14] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (26): Divider((
+                color: None,
+                background_color: None,
+                name: Some("PE array controls ------------------------------------"),
+            )),
+            (215): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Into PE array / out of memory activations ------------------------------------"),
+            )),
+            (195): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Data out if argmax - - - - - - - - - - - - - - -"),
+            )),
+            (9): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "MOSI",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "MOSI",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (132): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "gen_rows[0]",
+                            "gen_cols[15]",
+                            "pe_inst",
+                        ],
+                    ),
+                    name: "weight",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "…gen_rows[0].gen_cols[15].pe_inst.weight [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (87): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Out of PE array / into memory activations ------------------------------------"),
+            )),
+            (201): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[4]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[4] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (287): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "few_shot_learning_control_inst",
+                        ],
+                    ),
+                    name: "num_conv_and_linear_layers",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "num_conv_and_linear_layers [4:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (229): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[13]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[13] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (82): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "is_layer_residual",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…pe_array_control_inst.is_layer_residual",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (296): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "restart",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "restart",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (325): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "global_sram_power_down_controller_inst",
+                        ],
+                    ),
+                    name: "memories_ready",
+                ),
+                color: Some("gray"),
+                background_color: None,
+                display_name: "memories_ready",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (334): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "global_sram_power_down_controller_inst",
+                        ],
+                    ),
+                    name: "wake_up_delay",
+                ),
+                color: Some("red"),
+                background_color: None,
+                display_name: "wake_up_delay [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (280): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "few_shot_shift_required",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "few_shot_shift_required [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (73): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[14]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[14] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (109): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "address",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "address [5:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (128): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "enable_pe_array",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "enable_pe_array",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (29): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "weight_address",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "weight_address [9:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (199): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[2]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[2] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (7): Divider((
+                color: None,
+                background_color: None,
+                name: Some("SPI ------------------------------------"),
+            )),
+            (183): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[15]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[15] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (209): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[12]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[12] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (2): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "clk",
+                ),
+                color: Some("yellow"),
+                background_color: None,
+                display_name: "clk",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (131): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Weight row 0 col 0 -----------------------------"),
+            )),
+            (276): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "new_few_shot_bias",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "new_few_shot_bias [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (10): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "MISO",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "MISO",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (207): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[10]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[10] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (108): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "read_enable",
+                ),
+                color: Some("yellow"),
+                background_color: None,
+                display_name: "read_enable",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (114): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "detect_not_ready",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "detect_not_ready",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (19): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "out_request",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "out_request",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (123): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "is_layer_residual",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "…input_memory_inst.is_layer_residual",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (316): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "blocks_required",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "blocks_required",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (16): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "out_acknowledge",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "out_acknowledge",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (211): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[14]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[14] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (149): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "few_shot_learning_control_inst",
+                        ],
+                    ),
+                    name: "start_few_shot_processing",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "start_few_shot_processing",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (79): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (51): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "output_ready",
+                ),
+                color: Some("red"),
+                background_color: None,
+                display_name: "output_ready",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (182): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[14]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[14] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (330): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "global_power_down",
+                ),
+                color: Some("yellow"),
+                background_color: None,
+                display_name: "global_power_down",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (315): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "data_available",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "data_available",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (63): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[4]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[4] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (164): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "activation_control_data_in",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "activation_control_data_in [63:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Binary (with groups)"),
+                field_formats: [],
+            )),
+            (218): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[2]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[2] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (93): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "weight_data_out",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "weight_data_out [1023:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Hexadecimal"),
+                field_formats: [],
+            )),
+            (137): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                        ],
+                    ),
+                    name: "apply_in_scale",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "apply_in_scale",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (24): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Internals ------------------------------------"),
+            )),
+            (56): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "restart_argmax",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "restart_argmax",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (208): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[11]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[11] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (60): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[1]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[1] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (288): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "few_shot_next_layer_blocks",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "few_shot_next_layer_blocks [5:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (224): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[8]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[8] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (290): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "weight_address_few_shot_corrected",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "weight_address_few_shot_corrected [9:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (275): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "restart_pe_array_control",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "restart_pe_array_control",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (175): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[7]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[7] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (274): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "use_l2_for_few_shot",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "use_l2_for_few_shot",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (59): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[0]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[0] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (220): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[4]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[4] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (323): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "global_sram_power_down_controller_inst",
+                        ],
+                    ),
+                    name: "allow_power_down",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "allow_power_down",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (17): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Output bus ------------------------------------"),
+            )),
+            (113): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "request_new_blocks",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "request_new_blocks",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (202): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[5]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[5] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (99): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Into PE array / out of memory activations ------------------------------------"),
+            )),
+            (22): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "toggle_processing",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "toggle_processing",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (221): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[5]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[5] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (129): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "dont_wait_for_linear_layer",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "dont_wait_for_linear_layer",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (167): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Biases ---------------------------------------"),
+            )),
+            (181): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[13]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[13] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (306): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Configuration ------------------------------------"),
+            )),
+            (106): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "out_blocks_completed_counter",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "out_blocks_completed_counter [5:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (100): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Weights ------------------------------------"),
+            )),
+            (176): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[8]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[8] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (213): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "enable_pe_control",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "enable_pe_control",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (130): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "gen_rows[0]",
+                            "gen_cols[0]",
+                            "pe_inst",
+                        ],
+                    ),
+                    name: "weight",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "…gen_cols[0].pe_inst.weight [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (336): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "start_sending",
+                ),
+                color: Some("yellow"),
+                background_color: None,
+                display_name: "start_sending",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (127): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "address",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "address [5:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (84): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "residual_steps",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "residual_steps [5:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (158): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "enable_pe_array_during_few_shot",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "enable_pe_array_during_few_shot",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (86): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (103): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "data_required",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "data_required",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (94): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "is_input_layer",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "is_input_layer",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (105): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "ready",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "ready",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (134): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "gen_rows[15]",
+                            "gen_cols[15]",
+                            "pe_inst",
+                        ],
+                    ),
+                    name: "weight",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "…gen_rows[15].gen_cols[15].pe_inst.weight [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (297): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "in_activation_data",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "in_activation_data [63:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Binary (with groups)"),
+                field_formats: [],
+            )),
+            (216): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[0]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[0] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (31): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "out_activation_address",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "out_activation_address [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (139): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                        ],
+                    ),
+                    name: "out_scale_reg",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "out_scale_reg [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (333): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "global_sram_power_down_controller_inst",
+                        ],
+                    ),
+                    name: "power_up_delay",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "power_up_delay [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (57): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "argmax",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "argmax [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (329): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "power_down_memories_while_running",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "power_down_memories_while_running",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (27): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "in_activation_address",
+                ),
+                color: Some("yellow"),
+                background_color: None,
+                display_name: "in_activation_address [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (12): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Clock & reset ------------------------------------"),
+            )),
+            (313): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "load_configuration_after_exiting_idle",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "load_configuration_after_exiting_idle",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (55): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "enable_argmax",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "enable_argmax",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (159): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "scale_and_bias_ready_few_shot",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "scale_and_bias_ready_few_shot",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (338): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "is_input_memory_ready",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "is_input_memory_ready",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (30): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                        ],
+                    ),
+                    name: "bias_address",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "bias_address [6:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (20): Divider((
+                color: None,
+                background_color: None,
+                name: Some("GPIOs ------------------------------------"),
+            )),
+            (6): TimeLine((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (115): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "chunks_completed",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "chunks_completed [1:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (77): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (104): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "input_memory_inst",
+                        ],
+                    ),
+                    name: "num_blocks_required",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "num_blocks_required [5:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (309): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "restart_input_memory",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "restart_input_memory",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (278): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "squared_log2_sum_accumulator_inst",
+                        ],
+                    ),
+                    name: "out",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "out [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (173): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[5]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[5] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (203): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[6]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[6] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (85): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (227): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[11]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[11] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (78): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (210): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[13]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[13] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (172): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[4]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[4] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (76): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (135): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Weight row 15 col 15 -----------------------------"),
+            )),
+            (4): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "rst_async",
+                ),
+                color: Some("yellow"),
+                background_color: None,
+                display_name: "rst_async",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (13): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Input bus ------------------------------------"),
+            )),
+            (171): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[3]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[3] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (150): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "few_shot_learning_control_inst",
+                        ],
+                    ),
+                    name: "embedding_layer_blocks_plus_one",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "embedding_layer_blocks_plus_one [6:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (169): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "biases",
+                        ],
+                    ),
+                    name: "[1]",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "…biases.[1] [13:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (187): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "few_shot_learning_control_inst",
+                        ],
+                    ),
+                    name: "which_output_block",
+                ),
+                color: Some("violet"),
+                background_color: None,
+                display_name: "which_output_block [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (54): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "data_out",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "data_out [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Binary"),
+                field_formats: [],
+            )),
+            (70): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "u_serial_parallel_argmax",
+                            "data",
+                        ],
+                    ),
+                    name: "[11]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…data.[11] [17:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Signed"),
+                field_formats: [],
+            )),
+            (23): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "is_new_task",
+                ),
+                color: Some("orange"),
+                background_color: None,
+                display_name: "is_new_task",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (88): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Out of PE array / into memory activations ------------------------------------"),
+            )),
+            (50): Divider((
+                color: None,
+                background_color: None,
+                name: Some("Argmax inputs ------------------------------------"),
+            )),
+            (102): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (214): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                        ],
+                    ),
+                    name: "apply_bias",
+                ),
+                color: Some("red"),
+                background_color: None,
+                display_name: "apply_bias",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (198): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[1]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[1] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (196): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (18): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "in_acknowledge",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "in_acknowledge",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (317): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_control_inst",
+                            "steps_in_kernel_counter",
+                        ],
+                    ),
+                    name: "[0]",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "…steps_in_kernel_counter.[0] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (206): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "out",
+                        ],
+                    ),
+                    name: "[9]",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "…out.[9] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+            (337): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "is_output_layer",
+                ),
+                color: Some("blue"),
+                background_color: None,
+                display_name: "is_output_layer",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (305): Divider((
+                color: None,
+                background_color: None,
+                name: None,
+            )),
+            (157): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                        ],
+                    ),
+                    name: "enable_pe_array_few_shot_corrected",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "enable_pe_array_few_shot_corrected",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (222): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "chameleon",
+                            "pe_array_inst",
+                            "in",
+                        ],
+                    ),
+                    name: "[6]",
+                ),
+                color: Some("pink"),
+                background_color: None,
+                display_name: "…in.[6] [3:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: Some("Unsigned"),
+                field_formats: [],
+            )),
+        },
+        display_item_ref_counter: 339,
+        viewports: [
+            (
+                curr_left: (0.10603255922737048),
+                curr_right: (0.10619292530262793),
+            ),
+        ],
+        cursor: Some((1, [
+            2945002193,
+        ])),
+        right_cursor: None,
+        markers: {},
+        focused_item: Some((196)),
+        default_variable_name_type: Unique,
+        scroll_offset: 1468.0,
+        display_variable_indices: true,
+    )),
+    drag_started: false,
+    drag_source_idx: None,
+    drag_target_idx: Some((86)),
+    previous_waves: None,
+    count: None,
+    blacklisted_translators: [],
+    show_about: false,
+    show_keys: false,
+    show_gestures: false,
+    show_quick_start: false,
+    show_license: false,
+    show_performance: false,
+    show_logs: false,
+    show_cursor_window: false,
+    wanted_timeunit: PicoSeconds,
+    time_string_format: None,
+    show_url_entry: false,
+    variable_name_filter_focused: true,
+    variable_name_filter_type: Fuzzy,
+    variable_name_filter_case_insensitive: true,
+    rename_target: None,
+    ui_zoom_factor: None,
+)

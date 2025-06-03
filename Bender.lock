@@ -1,0 +1,13 @@
+packages:
+  asic-cells:
+    revision: 55a3ad9235059204f98dca678775a9d1b7e73077
+    version: null
+    source:
+      Git: git@github.com:cogsys-tudelft/asic-cells.git
+    dependencies: []
+  verilog-array-operations:
+    revision: 37c58efe0d0e3d5c679b98bf01a82e516a8a4c00
+    version: null
+    source:
+      Git: git@github.com:V0XNIHILI/verilog-array-operations.git
+    dependencies: []
