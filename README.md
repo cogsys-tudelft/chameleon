@@ -21,9 +21,9 @@ In case you decide to use the Chameleon source code for academic or commercial u
 - [`src/`](src/): RTL (Verilog) source code
 - [`scripts/`](scripts/): Scripts for Verilog formatting and configs for various waveviewers 
 - [`chameleon/`](chameleon/)
-    - [`core/`](core/): Core Python code to load and run trained nets and to communicate with the ASIC.
-    - [`fpga_bridge/`](fpga_bridge/): Python code that runs on the FPGA to interface with the ASIC.
-    - [`sim/`](sim/): Simulation code for the ASIC.
+    - [`core/`](chameleon/core/): Core Python code to load and run trained nets and to communicate with the ASIC.
+    - [`fpga_bridge/`](chameleon/fpga_bridge/): Python code that runs on the FPGA to interface with the ASIC.
+    - [`sim/`](chameleon/sim/): Simulation code for the ASIC.
 - [`nets/`](nets/): Pre-trained networks in quantized state dict format used in the experiments.
 
 ## Installation
