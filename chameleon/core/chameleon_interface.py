@@ -18,10 +18,10 @@ from asic_cells.utils import chunk_list, to_binary_string
 
 from chameleon.core.quant_conversions import int_to_slog2
 
-from chameleon.core.net_transfer_utils import get_network_config, weight_rows_to_messages, bias_rows_to_messages, get_weight_rows, get_output_data, get_input_messages, get_few_shot_scales, get_quant_state_dict_and_layers, activations_to_messages
-from chameleon.core.net_load_utils import get_random_tcn, get_random_input_tensor, get_output_size, get_random_input_tensor_by_length, get_quant_input
-from chameleon.core.shared_utils import twos_complement_to_int, QuantLayers, iclog2, clog2, correct_subsection_mode_argmax, set_seed, assert_asic_out
-from chameleon.core.learning_utils import left_right_shift, compute_expected_weight_and_bias, get_subsection_blocks_2d, get_subsection_blocks_1d
+from chameleon.core.net_transfer_utils import get_network_config, weight_rows_to_messages, bias_rows_to_messages, get_weight_rows, get_output_data, get_input_messages, get_few_shot_scales, activations_to_messages, update_last_layer_bias_after_n
+from chameleon.core.net_load_utils import get_random_tcn, get_random_input_tensor, get_output_size, get_random_input_tensor_by_length, get_quant_input, get_quant_in_and_layers, get_all_weights_and_biases
+from chameleon.core.shared_utils import twos_complement_to_int, QuantLayers, iclog2, clog2, correct_subsection_mode_argmax, set_seed, assert_asic_out, left_right_shift, num_blocks
+from chameleon.core.learning_utils import compute_expected_weight_and_bias, get_subsection_blocks_2d, get_subsection_blocks_1d
 from chameleon.core.numpy.tcn import tcn_network, fc_bias_relu
 
 
@@ -409,7 +409,11 @@ class ChameleonInterface:
                 assert input_channels <= self.params.HIGH_SPEED_IN_PINS // self.params.ACTIVATION_BIT_WIDTH
         elif input_channels % self.params.PE_ROWS != 0:
             new_channels = math.ceil(input_channels / self.params.PE_ROWS) * self.params.PE_ROWS
-            x = np.pad(x, ((0, new_channels-input_channels), (0, 0)), mode='constant', constant_values=0).astype(x.dtype)
+            if input_channels == 31:
+                self.log_info("DOING 31 FIX!!!!!!!!!!!!!!")
+                x = np.pad(x, ((0, 17), (0, 0)), mode='constant', constant_values=0).astype(x.dtype)
+            else:
+                x = np.pad(x, ((0, new_channels-input_channels), (0, 0)), mode='constant', constant_values=0).astype(x.dtype)
 
         assert expected_output_channels < 0 or expected_output_channels % (self.params.SUBSECTION_SIZE if in_subsection_mode else self.params.PE_ROWS) == 0, "Expected output channels must be a multiple of the PE size"
  
@@ -598,7 +602,7 @@ class ChameleonInterface:
         await self.sleep(timeout)
         self.set_asic_inputs(is_new_task=False)
 
-    async def write_network_to_asic(self, quant_layers: QuantLayers, padding_value: Optional[int] = None, subsection_network: bool = False, icl_layers_shots: Optional[Tuple[int, int]] = None, are_icl_shots_labeled: bool = False, activation_memory_address: Optional[int] = None, continued_learning: Optional[bool] = None):
+    def convert_network_to_asic_format(self, quant_layers: QuantLayers, padding_value: Optional[int] = None, subsection_network: bool = False, icl_settings: Optional[Dict] = None, are_icl_shots_labeled: bool = False, activation_memory_address: Optional[int] = None, continued_learning: Optional[bool] = None):
         blocks = []
         biases = []
         scales = []
@@ -620,7 +624,7 @@ class ChameleonInterface:
                 weight, bias, scale = layer
 
                 if num_input_blocks == -1:
-                    num_input_blocks = weight.shape[1] / rows
+                    num_input_blocks = math.ceil(weight.shape[1] / rows)
 
                 linear_blocks.append(weight.shape[0] / rows)
 
@@ -630,16 +634,6 @@ class ChameleonInterface:
                 downsample_scales.append(0)
             elif len(layer) == 2:
                 ((weight1, bias1, scale1), _), ((weight2, bias2, scale2), (downsample_weight, downsample_scale)) = layer
-
-                if num_input_blocks == -1:
-                    num_input_blocks = math.ceil(weight1.shape[1] / rows)
-
-                num_conv_blocks_per_layer.extend([weight1.shape[0] / rows, weight2.shape[0] / rows])
-                conv_kernel_sizes_per_layer.extend([weight1.shape[2], weight2.shape[2]])
-
-                biases.extend([bias1, bias2])
-                scales.extend([scale1, scale2])
-                downsample_scales.extend([0, downsample_scale])
 
                 intermediate_channels1, in_channels, kernel_size1 = weight1.shape
                 out_channels, intermediate_channels2, kernel_size = weight2.shape
@@ -662,7 +656,34 @@ class ChameleonInterface:
                     assert downsample_in_channels == in_channels, downsample_channel_error_message("input")
                     assert downsample_out_channels == out_channels, downsample_channel_error_message("output")
 
-                    downsample_weight_entries = chunk_list(get_weight_rows(downsample_weight, self.params.PE_COLS, self.params.SUBSECTION_SIZE, padding_value, subsection_network), math.ceil(downsample_in_channels / rows))
+                    if num_blocks(downsample_out_channels, rows) == num_blocks(downsample_in_channels, rows) and downsample_out_channels != downsample_in_channels:
+                        assert i == 0, f"Having different number of input and output channels but the same number of blocks is currently only supported for the first layer (layer 0), but it is layer {i}"
+
+                        new_in_dim = (num_blocks(downsample_in_channels, rows) + 1) * rows
+
+                        padded_downsample_weight = np.zeros((downsample_out_channels, new_in_dim, 1), dtype=downsample_weight.dtype)
+                        padded_downsample_weight[:, :downsample_in_channels, :] = downsample_weight
+                        downsample_weight = padded_downsample_weight
+
+                        padded_weight1 = np.zeros((intermediate_channels1, new_in_dim, kernel_size1), dtype=weight1.dtype)
+                        padded_weight1[:, :in_channels, :] = weight1
+                        weight1 = padded_weight1
+
+                        downsample_in_channels = new_in_dim
+
+                        self.log_info(f"> Applied hotfix for downsample weight with different number of input and output channels but same number of blocks for layer {i}")
+
+                    downsample_weight_entries = chunk_list(get_weight_rows(downsample_weight, self.params.PE_COLS, self.params.SUBSECTION_SIZE, padding_value, subsection_network), num_blocks(downsample_in_channels, rows))
+
+                if num_input_blocks == -1:
+                    num_input_blocks = math.ceil(weight1.shape[1] / rows)
+
+                num_conv_blocks_per_layer.extend([weight1.shape[0] / rows, weight2.shape[0] / rows])
+                conv_kernel_sizes_per_layer.extend([weight1.shape[2], weight2.shape[2]])
+
+                biases.extend([bias1, bias2])
+                scales.extend([scale1, scale2])
+                downsample_scales.extend([0, downsample_scale])
 
                 conv0_weight_rows = get_weight_rows(weight1, self.params.PE_COLS, self.params.SUBSECTION_SIZE, padding_value, subsection_network)
                 conv1_weight_rows = get_weight_rows(weight2, self.params.PE_COLS, self.params.SUBSECTION_SIZE, padding_value, subsection_network)
@@ -715,12 +736,36 @@ class ChameleonInterface:
             self.params.MAX_KERNEL_SIZE,
             math.ceil(self.params.MAX_NUM_CHANNELS / rows),
             self.params.ACTIVATION_ROWS,
-            icl_layers_shots=icl_layers_shots,
+            icl_settings=icl_settings,
             are_icl_shots_labeled=are_icl_shots_labeled,
             activation_memory_address=activation_memory_address,
             continued_learning=continued_learning
         )
 
+        return dict(
+            network_config=network_config,
+            all_weight_messages=all_weight_messages,
+            all_bias_messages=all_bias_messages,
+            max_weight_address=max_weight_address,
+            downsample_scales=downsample_scales,
+            scales=scales
+        )
+
+    async def write_network_to_asic(self, quant_layers: QuantLayers, padding_value: Optional[int] = None, subsection_network: bool = False, icl_settings: Optional[Dict] = None, are_icl_shots_labeled: bool = False, activation_memory_address: Optional[int] = None, continued_learning: Optional[bool] = None):
+        weights, biases = get_all_weights_and_biases(quant_layers)
+        weight_count = sum(len(weight) for weight in weights)
+        bias_count = sum(len(bias) for bias in biases)
+        self.log_info(f"> Total parameters in the network: {weight_count + bias_count} (weights: {weight_count}, biases: {bias_count})")
+
+        network_prepared_for_asic = self.convert_network_to_asic_format(quant_layers, padding_value, subsection_network, icl_settings, are_icl_shots_labeled, activation_memory_address, continued_learning)
+
+        network_config = network_prepared_for_asic["network_config"]
+        all_weight_messages = network_prepared_for_asic["all_weight_messages"]
+        all_bias_messages = network_prepared_for_asic["all_bias_messages"]
+        max_weight_address = network_prepared_for_asic["max_weight_address"]
+        downsample_scales = network_prepared_for_asic["downsample_scales"]
+        scales = network_prepared_for_asic["scales"]
+        
         scale_and_residual_scale_per_layer = [(downsample_scale << self.params.SCALE_BIT_WIDTH) + scale if scale != -1 else 0 for (downsample_scale, scale) in zip(downsample_scales, scales)]
         network_config["scale_and_residual_scale_per_layer"] = scale_and_residual_scale_per_layer
 
@@ -750,7 +795,7 @@ class ChameleonInterface:
                                              n_last_layers_to_remove: Optional[int] = None, padding_value: Optional[int] = None,
                                              subsection_network: bool = False, continued_learning: Optional[bool] = None,
                                              activation_memory_address: Optional[int] = None):
-        quant_in, quant_layers = get_quant_state_dict_and_layers(net_path_or_state_dict, slog2_weights,
+        quant_in, quant_layers = get_quant_in_and_layers(net_path_or_state_dict, slog2_weights,
                                                                  scale_bit_width=self.params.SCALE_BIT_WIDTH,
                                                                  accepted_layers=accepted_layers,
                                                                  n_last_layers_to_remove=n_last_layers_to_remove)
@@ -977,7 +1022,7 @@ class ChameleonInterface:
                     await self.disable_subsection_mode()
 
     async def learn_with_few_shots(self,
-                                    dataset,
+                                    few_shot_dataset: FewShot,
                                     shots: int,
                                     query_shots: int,
                                     ways: int,
@@ -986,12 +1031,13 @@ class ChameleonInterface:
                                     expected_accuracies: Tuple[Optional[Tuple[float, float]], Optional[Tuple[float, float]]],
                                     quant_state_dict_file_path: str,
                                     n_last_layers_to_remove: Optional[int] = None,
+                                    n_last_layers_to_remove_query: Optional[int] = None,
                                     require_single_chunk: bool = False,
                                     seed: int = 0,
                                     l2_options: Union[str, bool] = 'both',
                                     check_memory_contents: bool = True,
                                     in_subsection_mode: bool = False,
-                                    icl_shots: int = 0,
+                                    quant_icl_layers: Optional[Union[QuantLayers, Dict]] = None,
                                     are_icl_shots_labeled: bool = False,
                                     power_down_memories_while_running: tuple = (False, True),
                                     clip_inputs: bool = True,
@@ -999,61 +1045,134 @@ class ChameleonInterface:
                                     pre_embed_hook: Optional[Callable] = None,
                                     verify: bool = True,
                                     expected_out: Optional[List[List[int]]] = None,
-                                    send_all_argmax_chunks: Optional[bool] = None):
-        set_seed(seed)
-
-        in_context_learning = icl_shots != 0
+                                    send_all_argmax_chunks: Optional[bool] = None,
+                                    icl_classification_options: Optional[Union[str, bool]] = None,
+                                    query_sample_embedder_quant_state_dict_file_path: Optional[str] = None):
         output_blocks_for_icl = 0
         labels_for_icl = None
+        icl_settings = None
+        relation_net_padding = 0
+        num_icl_net_layers = 0
+        maximum_zsl_start_address = None
+        query_block_size = None
 
-        if in_context_learning:
-            assert ways == 1, "In-context learning only works with 1 way"
-            assert ways_for_continued_learning == 0, "In-context learning only works with 0 ways for continued learning"
+        in_context_learning = quant_icl_layers is not None
+        zero_shot_learning = query_sample_embedder_quant_state_dict_file_path is not None
+        query_sample_embedder_quant_in, query_sample_embedder_quant_layers = None, None
 
-            output_blocks_for_icl = 1
+        set_seed(seed)
 
         if send_all_argmax_chunks is None:
             send_all_argmax_chunks = ways > 2**self.params.HIGH_SPEED_OUT_PINS
         elif send_all_argmax_chunks == False and ways > 2**self.params.HIGH_SPEED_OUT_PINS:
             raise ValueError("Number of ways is too large for the given number of high speed output pins. Enable `send_all_argmax_chunks` to send all argmax chunks instead of just the first one.")
 
+        if check_memory_contents:
+            assert verify, "Memory content checking can only be done while also verifying the output of the network as the expected output is needed to determine the expected memory contents"
+
+        if in_context_learning:
+            assert ways_for_continued_learning == 0, "In-context learning only works with 0 ways for continued learning"
+            assert icl_classification_options is not None, "Must specify classification options for in-context learning"
+            assert l2_options == False, "L2 distance cannot be used for in-context learning"
+            assert shots == 1, "Only one shot can be used for in-context learning as the number of shots is determined by the number of ways in this case"
+
+            output_blocks_for_icl = math.ceil(ways / (self.params.SUBSECTION_SIZE if in_subsection_mode else self.params.PE_ROWS))
+        else:
+            assert are_icl_shots_labeled == False, "ICL shots cannot be labeled if not doing in-context learning"
+            assert zero_shot_learning == False, "Provide 'quant_icl_layers' for zero-shot learning"
+
+        if zero_shot_learning:
+            assert are_icl_shots_labeled == False, "'are_icl_shots_labeled' must be False for zero-shot learning as there are no ICL shots"
+
+            query_sample_embedder_quant_in, query_sample_embedder_quant_layers = get_quant_in_and_layers(query_sample_embedder_quant_state_dict_file_path, True,
+                                                scale_bit_width=self.params.SCALE_BIT_WIDTH, **n_last_layers_to_remove_query)
+
         if ways_for_continued_learning == 0:
             if in_context_learning:
-                quant_in, quant_layers = get_quant_state_dict_and_layers(quant_state_dict_file_path, True,
+                quant_in, quant_layers = get_quant_in_and_layers(quant_state_dict_file_path, True,
                                                                 scale_bit_width=self.params.SCALE_BIT_WIDTH,
-                                                                accepted_layers=None,
-                                                                n_last_layers_to_remove=n_last_layers_to_remove)
-                
-                icl_embedding_size = quant_layers[-1][-1][0][1].shape[0]
-                icl_block_size = math.ceil(icl_embedding_size / (self.params.SUBSECTION_SIZE if in_subsection_mode else self.params.PE_ROWS))
+                                                                **n_last_layers_to_remove)
 
-                new_in_size = (icl_shots+1) * icl_block_size
+                # We have to do -2 since we always reserve a linear layer at the end
+                sample_embedder_last_layer_act_addr_start = self.convert_network_to_asic_format(
+                    quant_layers,
+                    padding_value=0,
+                    subsection_network=in_subsection_mode
+                )["network_config"]["blocks_per_layer_times_kernel_size_cumsum"][-2]
+
+                icl_embedding_size = get_output_size(quant_layers)
+
+                if zero_shot_learning:
+                    query_sample_embedder_last_layer_act_addr_start = self.convert_network_to_asic_format(
+                        query_sample_embedder_quant_layers,
+                        padding_value=0,
+                        subsection_network=in_subsection_mode
+                    )["network_config"]["blocks_per_layer_times_kernel_size_cumsum"][-2]
+
+                    maximum_zsl_start_address = max(sample_embedder_last_layer_act_addr_start, query_sample_embedder_last_layer_act_addr_start)
+
+                    # If larger than 0, this means that the query sample embedder should be fixed to write its outputs to the same activation memory addresses as the sample embedder
+                    # If not, then the sample embedder has to be fixed.
+                    relation_net_padding = sample_embedder_last_layer_act_addr_start - query_sample_embedder_last_layer_act_addr_start
+
+                    if type(quant_icl_layers) is dict:
+                        # We currently do not support automatically updating the given ICL layers to support non-divisible output sizes for ZSL
+                        assert get_output_size(query_sample_embedder_quant_layers) % self.params.PE_ROWS == 0, f"Output size of query sample embedder must be divisible by the number of PE rows for zero-shot learning. Got {get_output_size(query_sample_embedder_quant_layers)} output size and {self.params.PE_ROWS} PE rows."
+                        assert icl_embedding_size % self.params.PE_ROWS == 0, f"Output size of sample embedder must be divisible by the number of PE rows for zero-shot learning. Got {get_output_size(quant_layers)} output size and {self.params.PE_ROWS} PE rows."
+                else:
+                    maximum_zsl_start_address = sample_embedder_last_layer_act_addr_start
+
+                icl_block_size = math.ceil(icl_embedding_size / (self.params.SUBSECTION_SIZE if in_subsection_mode else self.params.PE_ROWS))
+                new_in_size = ways * icl_block_size
+
+                # Sample embedder offset is the offset that is required when the embedding size of the sample embedder is
+                # different from that of the query sample embedder in zero-shot learning
+                sample_embedder_offset = 0
+
+                if zero_shot_learning:
+                    query_block_size = math.ceil(get_output_size(query_sample_embedder_quant_layers) / (self.params.SUBSECTION_SIZE if in_subsection_mode else self.params.PE_ROWS))
+                    new_in_size += query_block_size
+                    sample_embedder_offset += query_block_size - icl_block_size
+                else:
+                    query_block_size = icl_block_size
+                    new_in_size += icl_block_size
 
                 if are_icl_shots_labeled:
-                    new_in_size += icl_shots * icl_block_size
+                    new_in_size += ways * icl_block_size
 
-                # TODO: move ICL network creation outside of FSL verification function
-                num_icl_net_layers = 3
-                quant_layers_icl = get_random_tcn(
-                    new_in_size,
-                    [],
-                    [],
-                    [2, 3, output_blocks_for_icl],
-                    pe_rows=self.params.PE_ROWS,
-                    weight_bit_width=self.params.WEIGHT_BIT_WIDTH,
-                    act_bit_width=self.params.ACTIVATION_BIT_WIDTH,
-                    bias_bit_width=self.params.BIAS_BIT_WIDTH,
-                    subsection_size=self.params.SUBSECTION_SIZE if in_subsection_mode else -1,
-                    slog2_weights=True
+                if type(quant_icl_layers) == dict:
+                    quant_icl_layers = get_random_tcn(
+                        input_blocks=new_in_size,
+                        **quant_icl_layers,
+                        pe_rows=self.params.PE_ROWS,
+                        weight_bit_width=self.params.WEIGHT_BIT_WIDTH,
+                        act_bit_width=self.params.ACTIVATION_BIT_WIDTH,
+                        bias_bit_width=self.params.BIAS_BIT_WIDTH,
+                        subsection_size=self.params.SUBSECTION_SIZE if in_subsection_mode else -1,
+                        slog2_weights=True
+                    )
+
+                    # TODO: ideally this is only done during classification!
+                    update_last_layer_bias_after_n(quant_icl_layers, n=ways, new_bias_value=-2**(self.params.BIAS_BIT_WIDTH-1)+1)
+
+                num_icl_net_layers = len(quant_icl_layers)
+
+                icl_settings = {
+                    "num_extra_icl_layers": num_icl_net_layers if not zero_shot_learning else 0,
+                    "icl_padding": new_in_size
+                }
+
+                net_cfg = await self.write_network_to_asic(
+                    quant_layers if zero_shot_learning else quant_layers + quant_icl_layers,
+                    padding_value=0,
+                    subsection_network=in_subsection_mode,
+                    icl_settings={**icl_settings, "zsl_padding": (-relation_net_padding if relation_net_padding < 0 else 0) + sample_embedder_offset} if zero_shot_learning else icl_settings,
+                    are_icl_shots_labeled=are_icl_shots_labeled
                 )
 
-                net_cfg = await self.write_network_to_asic(quant_layers + quant_layers_icl, padding_value=0, subsection_network=in_subsection_mode, icl_layers_shots=(num_icl_net_layers, icl_shots), are_icl_shots_labeled=are_icl_shots_labeled)
-
                 if are_icl_shots_labeled:
-                    from chameleon.core.net_transfer_utils import activations_to_messages
-
                     max_activation_value = 2**self.params.ACTIVATION_BIT_WIDTH-1
-                    labels_for_icl = np.ones((icl_embedding_size*icl_shots, 1), dtype=int) * max_activation_value
+                    labels_for_icl = np.ones((icl_embedding_size*ways, 1), dtype=int) * max_activation_value
 
                     all_input_messages = activations_to_messages(labels_for_icl,
                             activation_bit_width=self.params.ACTIVATION_BIT_WIDTH,
@@ -1062,21 +1181,21 @@ class ChameleonInterface:
                             subsection_size=self.params.SUBSECTION_SIZE,
                             spi_message_bit_width=self.params.MESSAGE_BIT_WIDTH)
                     
-                    label_start_address = net_cfg["blocks_per_layer_times_kernel_size_cumsum"][-num_icl_net_layers-1] - icl_block_size * icl_shots
+                    label_start_address = net_cfg["blocks_per_layer_times_kernel_size_cumsum"][-num_icl_net_layers-1] - icl_block_size * ways
                     message_activation_row_factor = (self.params.ACTIVATION_BIT_WIDTH * self.params.PE_ROWS) // self.params.MESSAGE_BIT_WIDTH
 
                     await self.write_asic_memory_over_spi("activations", all_input_messages, label_start_address*message_activation_row_factor)
             else:
                 quant_in, quant_layers, net_cfg = await self.write_quant_state_dict_to_asic(
                     quant_state_dict_file_path,
-                    True, None, n_last_layers_to_remove, padding_value=0,
+                    True, None, n_last_layers_to_remove=n_last_layers_to_remove, padding_value=0,
                     subsection_network=in_subsection_mode, continued_learning=False
                 )
         else:
-            quant_in, quant_layers = get_quant_state_dict_and_layers(quant_state_dict_file_path, True,
+            quant_in, quant_layers = get_quant_in_and_layers(quant_state_dict_file_path, True,
                                                                     scale_bit_width=self.params.SCALE_BIT_WIDTH,
                                                                     accepted_layers=None,
-                                                                    n_last_layers_to_remove=n_last_layers_to_remove)
+                                                                    **n_last_layers_to_remove)
             net_cfg = None
 
         embedding_size = get_output_size(quant_layers)
@@ -1085,9 +1204,8 @@ class ChameleonInterface:
         
         # Set a fixed random seed for Numpy as the FewShot class used Numpy's random number generation to create few-shot learning batches
         set_seed(seed)
-
-        few_shot_data = FewShot(dataset, ways, shots, query_shots)
-        few_shot_data_iter = iter(few_shot_data)
+        
+        few_shot_data_iter = iter(few_shot_dataset)
 
         first_loop = True
         called_pre_embed = False
@@ -1103,7 +1221,12 @@ class ChameleonInterface:
         else:
             l2_options = (l2_options,)
 
-        classifications = [True, False] if in_context_learning else [True]
+        if icl_classification_options == 'both':
+            icl_classification_options = (False, True)
+        else:
+            icl_classification_options = (icl_classification_options,)
+
+        classifications = icl_classification_options if in_context_learning else [True]
 
         results = []
 
@@ -1114,7 +1237,7 @@ class ChameleonInterface:
             # Add here all processing variations to check!
             for power_down_memories_while_running_setting in power_down_memories_while_running:
                 for classification in classifications:
-                    self.log_info(f"> Running with: \n - shots: {shots}\n - icl_shots: {icl_shots}\n - in_subsection_mode: {in_subsection_mode}\n - power_down_memories_while_running: {power_down_memories_while_running}\n - classification: {classification}\n - use_l2_for_few_shot: {use_l2_for_few_shot}\n - ways_for_continued_learning: {ways_for_continued_learning}\n - in_context_learning: {in_context_learning}")
+                    self.log_info(f"> Running with: \n - shots: {shots}\n - icl_shots: {ways}\n - in_subsection_mode: {in_subsection_mode}\n - power_down_memories_while_running: {power_down_memories_while_running}\n - classification: {classification}\n - use_l2_for_few_shot: {use_l2_for_few_shot}\n - ways_for_continued_learning: {ways_for_continued_learning}\n - in_context_learning: {in_context_learning}")
 
                     # reset clock to normal
 
@@ -1122,7 +1245,7 @@ class ChameleonInterface:
                         classification=classification,
                         power_down_memories_while_running=power_down_memories_while_running_setting,
                         require_single_chunk=require_single_chunk,
-                        shots=1 + icl_shots if in_context_learning else shots, use_l2_for_few_shot=use_l2_for_few_shot,
+                        shots=1 + ways if in_context_learning else shots, use_l2_for_few_shot=use_l2_for_few_shot,
                         continued_learning=ways_for_continued_learning != 0,
                         in_subsection_mode=in_subsection_mode,
                         power_down_small_bias=in_subsection_mode, # TODO THIS IS NOT ALWAYS TRUE!
@@ -1169,7 +1292,13 @@ class ChameleonInterface:
                             embds = []
 
                             for i in range(shots):
+                                if self.verbose:
+                                    self.log_info(f"> ({i+1}/{shots}) Training shot")
+                                
                                 is_new_task = i == 0
+
+                                if in_context_learning:
+                                    is_new_task &= way == 0
 
                                 sample_idx = way*shots+i
                                 assert y_support[sample_idx] == way, "Support set is not correctly labeled"
@@ -1185,62 +1314,30 @@ class ChameleonInterface:
                                 embds.append(emb)
 
                                 if not creating_continued_output_layer:
-                                    expect_out = i >= icl_shots and in_context_learning
-
-                                    if expect_out:
-                                        if classification:
-                                            expected_output_channels = -1
-                                        else:
-                                            expected_output_channels = output_blocks_for_icl * self.params.PE_COLS
-                                    else:
-                                        expected_output_channels = 0
-
                                     if pre_embed_hook is not None and not called_pre_embed:
                                         await pre_embed_hook()
                                         called_pre_embed = True
 
-                                    asic_out = await self.forward(x, require_single_chunk=require_single_chunk,
-                                                    expected_output_channels=expected_output_channels, is_new_task=is_new_task,
-                                                    in_subsection_mode=in_subsection_mode)
-                                    
-                                    if i >= icl_shots and in_context_learning:
-                                        if i == icl_shots:
-                                            self.log_info("Starting ICL shot testing")
+                                    await self.forward(x, require_single_chunk=require_single_chunk,
+                                        expected_output_channels=0, is_new_task=is_new_task,
+                                        in_subsection_mode=in_subsection_mode)
 
-                                        # Put last embedding first as the last embedding is written
-                                        # inside the chip to the first location in memory for the next layer
-                                        embds = embds[-1:] + embds[:-1]
+                            correct_embeds = None
 
-                                        embds_array = np.array(embds).flatten()
+                            if not expected_out:
+                                if in_context_learning:
+                                    correct_embeds = embds[-1]
+                                else:
+                                    embds = np.array(embds)
+                                    sum_embds = np.sum(embds, axis=0)
+                                    shift_sum_embds = left_right_shift(sum_embds, few_shot_weight_scale)
 
-                                        if labels_for_icl is not None:
-                                            embds_array = np.concatenate((embds_array, labels_for_icl.flatten())).flatten()
+                                    assert np.max(shift_sum_embds) <= 2**(2**(self.params.WEIGHT_BIT_WIDTH-1)-1), "Embeddings are too large for the given bit width. Decrease the FEW_SHOT_SCALE value."
 
-                                        correct_out, _, unscaled = tcn_network(embds_array, quant_layers_icl,
-                                        act_bit_width=self.params.ACTIVATION_BIT_WIDTH,
-                                        accum_bit_width=self.params.ACCUMULATION_BIT_WIDTH)
-
-                                        assert_asic_out(asic_out, correct_out.flatten(), unscaled, classification, is_new_task, send_all_argmax_chunks)
-
-                                        # Remove first embedding
-                                        embds = embds[1:]
-
-                            if in_context_learning:
-                                break
-
-                            if verify and not expected_out:
-                                embds = np.array(embds)
-                                sum_embds = np.sum(embds, axis=0)
-                                shift_sum_embds = left_right_shift(sum_embds, few_shot_weight_scale)
-
-                                assert np.max(shift_sum_embds) <= 2**(2**(self.params.WEIGHT_BIT_WIDTH-1)-1), "Embeddings are too large for the given bit width. Decrease the FEW_SHOT_SCALE value."
-
-                                shift_sum_embds = np.where(shift_sum_embds == 0, 1, shift_sum_embds)
-                                log2s = np.log2(shift_sum_embds)
-                                flog2_sum_embds = np.floor(log2s)
-                                correct_embeds = flog2_sum_embds.flatten().astype(int)
-                            else:
-                                correct_embeds = None
+                                    shift_sum_embds = np.where(shift_sum_embds == 0, 1, shift_sum_embds)
+                                    log2s = np.log2(shift_sum_embds)
+                                    flog2_sum_embds = np.floor(log2s)
+                                    correct_embeds = flog2_sum_embds.flatten().astype(int)
 
                             ways_embeds.append(correct_embeds)
 
@@ -1249,7 +1346,7 @@ class ChameleonInterface:
 
                                 weight = int_to_slog2(weight, self.params.WEIGHT_BIT_WIDTH)
                                 net_cfg = await self.write_network_to_asic(quant_layers + [(weight, bias, -1)], padding_value=0, subsection_network=in_subsection_mode, continued_learning=True)
-                            elif not creating_continued_output_layer and check_memory_contents:
+                            elif not in_context_learning and (not creating_continued_output_layer and check_memory_contents):
                                 self.log_info("> Verifying memory contents")
 
                                 true_rows = self.params.SUBSECTION_SIZE if in_subsection_mode else self.params.PE_ROWS
@@ -1290,81 +1387,135 @@ class ChameleonInterface:
                                 npt.assert_array_equal(bias_mem_cont[:way+1-ways_for_continued_learning], expected_bias[ways_for_continued_learning:], "Biases are not correct")
                                 assert np.all(bias_mem_cont[way+1-ways_for_continued_learning:] == -2**(self.params.BIAS_BIT_WIDTH-1)), "All biases for unlearned ways should be -2**(self.params.BIAS_BIT_WIDTH-1)"
 
-                        if not in_context_learning:
-                            num_correct = 0
+                        if zero_shot_learning:
+                            self.log_info("> Writing query sample embedder to ASIC for zero-shot learning")
 
-                            if verify and not expected_out:
-                                ways_arr, bias = compute_expected_weight_and_bias(ways_embeds, self.params.WEIGHT_BIT_WIDTH, few_shot_bias_scale, use_l2_for_few_shot)
+                            zsl_icl_settings = {
+                                "num_extra_icl_layers": num_icl_net_layers,
+                                "icl_padding": icl_settings["icl_padding"],
+                                "query_block_size": query_block_size
+                            }
+                            
+                            if relation_net_padding > 0:
+                                zsl_icl_settings["zsl_padding"] = relation_net_padding
+                                
+                            net_cfg = await self.write_network_to_asic(
+                                query_sample_embedder_quant_layers + quant_icl_layers,
+                                padding_value=0,
+                                subsection_network=in_subsection_mode,
+                                icl_settings=zsl_icl_settings,
+                                are_icl_shots_labeled=are_icl_shots_labeled
+                            )
 
-                            testing_results = []
+                        num_correct = 0
 
-                            iterable = enumerate(zip(X_query, y_query))
+                        if verify and not expected_out and not in_context_learning:
+                            ways_arr, bias = compute_expected_weight_and_bias(ways_embeds, self.params.WEIGHT_BIT_WIDTH, few_shot_bias_scale, use_l2_for_few_shot)
 
-                            if not self.verbose:
-                                iterable = tqdm(iterable, desc="Testing query samples", unit="sample", total=query_shots*ways, leave=False)
+                        testing_results = []
 
-                            for i, (X_query_sample, y_query_sample) in enumerate(zip(X_query, y_query)):
-                                if self.verbose:
-                                    self.log_info(f"> ({i+1}/{query_shots*ways}) Testing query sample")
+                        iterable = enumerate(zip(X_query, y_query))
 
-                                # Take scalar so that when doing += on y_query_sample doesnt change y_query
-                                # in place so that the next time y_query is used, it's wrong
-                                y_query_sample = y_query_sample.item()
+                        if not self.verbose:
+                            iterable = tqdm(iterable, desc="Testing query samples", unit="sample", total=query_shots*ways, leave=False)
 
-                                x = get_quant_input(X_query_sample.numpy(), quant_layers, quant_in, clip=clip_inputs, pad=input_padding_strategy)
+                        if classification:
+                            expected_output_channels = -2 if send_all_argmax_chunks else -1
+                        else:
+                            expected_output_channels = output_blocks_for_icl * self.params.PE_COLS
 
-                                offset = math.ceil(ways_for_continued_learning / self.params.PE_COLS) * self.params.PE_COLS - ways_for_continued_learning
+                        # Test only once per batch, should be sufficient
+                        checked_icl_memory_contents = not check_memory_contents
 
-                                if ways_for_continued_learning > 0:
-                                    y_query_sample += (y_query_sample >= ways_for_continued_learning) * offset
+                        for i, (X_query_sample, y_query_sample) in enumerate(zip(X_query, y_query)):
+                            if self.verbose:
+                                self.log_info(f"> ({i+1}/{query_shots*ways}) Testing query sample")
 
+                            # Take scalar so that when doing += on y_query_sample doesnt change y_query
+                            # in place so that the next time y_query is used, it's wrong
+                            y_query_sample = y_query_sample.item()
+
+                            offset = math.ceil(ways_for_continued_learning / self.params.PE_COLS) * self.params.PE_COLS - ways_for_continued_learning
+
+                            if ways_for_continued_learning > 0:
+                                y_query_sample += (y_query_sample >= ways_for_continued_learning) * offset
+
+                            if zero_shot_learning:
+                                network = query_sample_embedder_quant_layers
+                                in_quant_for_network = query_sample_embedder_quant_in
+                            else:
+                                network = quant_layers
+                                in_quant_for_network = quant_in
+                            
+                            x = get_quant_input(X_query_sample.numpy(), network, in_quant_for_network, clip=clip_inputs, pad=input_padding_strategy)
+
+                            asic_out = await self.forward(x, require_single_chunk=require_single_chunk,
+                                            expected_output_channels=expected_output_channels,
+                                            in_subsection_mode=in_subsection_mode)                    
+
+                            if verify:
                                 correct_out = None
                                 unscaled = None
 
-                                if verify:
-                                    if expected_out is None:
-                                        correct_emb_out, _, _ = tcn_network(x, quant_layers,
+                                if expected_out is None:
+                                    correct_emb_out, _, _ = tcn_network(x, network,
                                                                         act_bit_width=self.params.ACTIVATION_BIT_WIDTH,
                                                                         accum_bit_width=self.params.ACCUMULATION_BIT_WIDTH)
-                                        
+
+                                    if in_context_learning:
+                                        embds_array = np.concatenate((correct_emb_out.flatten(), np.array(ways_embeds).flatten()), axis=0)
+
+                                        if labels_for_icl is not None:
+                                            embds_array = np.concatenate((embds_array, labels_for_icl.flatten()), axis=0).flatten()
+
+                                        if not checked_icl_memory_contents:
+                                            self.log_info("> Verifying ICL memory contents")
+                                            act_contents = (await self.get_activation_memory_contents(maximum_zsl_start_address, icl_settings["icl_padding"])).flatten()
+                                            checked_icl_memory_contents = True
+                                            assert np.array_equal(act_contents, embds_array), f"ICL memory contents do not match the expected input for the ICL layers. Got {act_contents}, expected {embds_array}"
+
+                                        correct_out, _, unscaled = tcn_network(embds_array, quant_icl_layers,
+                                        act_bit_width=self.params.ACTIVATION_BIT_WIDTH,
+                                        accum_bit_width=self.params.ACCUMULATION_BIT_WIDTH)
+                                    else:
                                         correct_out, unscaled = fc_bias_relu(correct_emb_out, ways_arr, bias, -1, -1, 2**(self.params.ACCUMULATION_BIT_WIDTH-1))
-                                        correct_out = correct_out.flatten()
                                         correct_out_argmax = np.argmax(unscaled)
 
                                         if ways_for_continued_learning > 0:
                                             correct_out_argmax += (correct_out_argmax >= ways_for_continued_learning) * offset
-                                    else:
-                                        correct_out_argmax = expected_out[batch_idx][i]
-                                        correct_out = np.zeros((embedding_size,), dtype=int)
-                                        correct_out[correct_out_argmax] = 1
                                 else:
-                                    correct_out_argmax = None
+                                    correct_out_argmax = expected_out[batch_idx][i]
+                                    correct_out = np.zeros((embedding_size,), dtype=int)
+                                    correct_out[correct_out_argmax] = 1
 
-                                asic_out = await self.forward(x, require_single_chunk=require_single_chunk, in_subsection_mode=in_subsection_mode, expected_output_channels=-2 if send_all_argmax_chunks else -1)
+                                assert_asic_out(asic_out, correct_out.flatten(), unscaled, classification, False, send_all_argmax_chunks)
+                                asic_out_argmax = asic_out[0] if type(asic_out) is tuple else asic_out
 
-                                if verify:
-                                    assert_asic_out(asic_out, correct_out, unscaled, True, False, send_all_argmax_chunks)
+                                # Check if ASIC output results in a correct classification
+                                num_correct += asic_out_argmax == y_query_sample
 
-                                    asic_out_argmax = asic_out[0] if type(asic_out) is tuple else asic_out
+                            testing_results.append((asic_out, y_query_sample))
 
-                                    # Check if ASIC output results in a correct classification
-                                    num_correct += asic_out_argmax == y_query_sample
+                        accuracy = num_correct / len(y_query)
 
-                                testing_results.append((asic_out, y_query_sample))
+                        results[-1]["results_per_batch"].append((testing_results, accuracy))
 
-                            accuracy = num_correct / len(y_query)
+                        if expected_accuracies[use_l2_for_few_shot] is not None:
+                            assert accuracy > expected_accuracies[use_l2_for_few_shot][0], f"Accuracy is too low: {accuracy}"
 
-                            results[-1]["results_per_batch"].append((testing_results, accuracy))
+                        self.log_info(f"> Accuracy: {accuracy*100}%")
 
-                            if expected_accuracies[use_l2_for_few_shot] is not None:
-                                assert accuracy > expected_accuracies[use_l2_for_few_shot][0], f"Accuracy is too low: {accuracy}"
-
-                            self.log_info(f"> Accuracy: {accuracy*100}%")
-
-                            if len(prev_accuracy) == num_batches:
-                                assert accuracy == prev_accuracy[batch_idx], f"Accuracy is not consistent: {accuracy} != {prev_accuracy[batch_idx]}"
-                            else:
-                                prev_accuracy.append(accuracy)
+                        if len(prev_accuracy) == num_batches:
+                            # TODO FIX BUG THAT FOR ICL WITH EMBEDDINGS AS OUTPUT THIS CHECK OF COURSE DOESNT WORK:
+                            # accuracy:
+                            # 0.35
+                            # prev_accuracy:
+                            # [array([0.3 , 0.2 , 0.45, 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 ,
+                            #         0.2 , 0.2 , 0.2 , 0.2 , 0.2 ]), array([0.4 , 0.2 , 0.15, 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 ,
+                            #         0.2 , 0.2 , 0.2 , 0.2 , 0.2 ])]
+                            assert accuracy == prev_accuracy[batch_idx], f"Accuracy is not consistent: {accuracy} != {prev_accuracy[batch_idx]}"
+                        else:
+                            prev_accuracy.append(accuracy)
 
                     if not in_context_learning:
                         avg_accuracy = np.mean(prev_accuracy)
@@ -1376,6 +1527,8 @@ class ChameleonInterface:
                             assert avg_accuracy > expected_accuracies[use_l2_for_few_shot][1], f"Average accuracy is too low: {np.mean(prev_accuracy)}"
 
         return results
+    
+    # TODO MAKE A MORE GENERAL FORWARD PASS WITH NETWORK AND CONFIG WRITING OPTIONS OVER MULTIPLE SAMPLES, ALSO FOR EMBEDDING TASKS
 
     async def classify_dataset(self,
                                dataset: Dataset,
@@ -1395,16 +1548,19 @@ class ChameleonInterface:
                                activation_memory_address: Optional[int] = None,
                                send_all_argmax_chunks: Optional[bool] = None,
                                pre_classify_hook: Optional[Callable] = None,
+                               force_downsample: bool = False,
                                verify: bool = True):
         if write_state_dict_to_asic:
-            quant_in, quant_layers, _ = await self.write_quant_state_dict_to_asic(
+            quant_in, quant_layers, net_cfg = await self.write_quant_state_dict_to_asic(
                 net_path_or_state_dict,
                 True, accepted_layers, padding_value=padding_value,
                 subsection_network=in_subsection_mode,
                 activation_memory_address=activation_memory_address
             )
+
+            self.log_info(f"Written state dict to ASIC with config: {net_cfg}")
         else:
-            quant_in, quant_layers = get_quant_state_dict_and_layers(
+            quant_in, quant_layers = get_quant_in_and_layers(
                 net_path_or_state_dict, True,
                 scale_bit_width=self.params.SCALE_BIT_WIDTH,
                 accepted_layers=accepted_layers
@@ -1426,7 +1582,8 @@ class ChameleonInterface:
                 in_subsection_mode=in_subsection_mode,
                 power_down_small_bias=in_subsection_mode, # todo this should be a separate flag
                 load_inputs_from_activation_memory=activation_memory_address is not None,
-                send_all_argmax_chunks=send_all_argmax_chunks
+                send_all_argmax_chunks=send_all_argmax_chunks,
+                force_downsample=force_downsample # TODOOOO DETERMINE THIS FLAG AUTOMATICALLY!!!!!!
             )
 
         called_pre_classify = False
@@ -1460,7 +1617,7 @@ class ChameleonInterface:
                 x, require_single_chunk=require_single_chunk,
                 in_subsection_mode=in_subsection_mode,
                 activation_memory_address=activation_memory_address,
-                send_all_argmax_chunks=-2 if send_all_argmax_chunks else -1
+                expected_output_channels=-2 if send_all_argmax_chunks else -1
             )
 
             if verify:

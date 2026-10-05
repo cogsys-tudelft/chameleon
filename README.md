@@ -138,11 +138,11 @@ save_quant_state_dict(quant_state_dict, "quant_model.pkl")
 We use Numpy primitives to simulate the network instead of PyTorch, as the Python code of this project has to run on the ARM core of the FPGA as well and PyTorch is likely a bit too heavy for that.
 
 ```python
-from chameleon.core.net_transfer_utils import get_quant_state_dict_and_layers
+from chameleon.core.net_load_utils import get_quant_in_and_layers
 
 path = "quant_model.pkl"  # Path to the exported quantized model
 
-in_quant, quant_layers = get_quant_state_dict_and_layers(path)
+in_quant, quant_layers = get_quant_in_and_layers(path)
 
 dataset = ...  # Load your dataset here
 

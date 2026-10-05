@@ -62,7 +62,12 @@ def set_seed(seed: int):
     random.seed(seed)
 
 
-def assert_asic_out(asic_out, correct_out: np.ndarray, unscaled: np.ndarray, classification: bool, is_new_task: bool, send_all_argmax_chunks: bool = False):
+def assert_asic_out(asic_out,
+                    correct_out: np.ndarray,
+                    unscaled: np.ndarray,
+                    classification: bool,
+                    is_new_task: bool,
+                    send_all_argmax_chunks: bool = False):
     if is_new_task:
         assert asic_out is None, f"ASIC output {asic_out} should be None for new task"
     elif classification:
@@ -74,7 +79,7 @@ def assert_asic_out(asic_out, correct_out: np.ndarray, unscaled: np.ndarray, cla
 
         assert asic_out == argmax, f"ASIC argmax {asic_out} does not match expected argmax {argmax}"
     else:
-        assert np.array_equal(asic_out, correct_out)
+        assert np.array_equal(asic_out.flatten(), correct_out.flatten())
 
 
 class NpyDataset(Dataset):
@@ -94,3 +99,16 @@ class NpyDataset(Dataset):
 
     def __len__(self):
         return len(self.file_names)
+
+
+def left_right_shift(x: np.ndarray, shift: int, pos_is_left: bool = True):
+    shift = shift if pos_is_left else -shift
+
+    if shift >= 0:
+        return np.left_shift(x, shift)
+    else:
+        return np.right_shift(x, -shift)
+
+
+def num_blocks(channels: int, channels_per_block: int):
+    return math.ceil(channels / channels_per_block)

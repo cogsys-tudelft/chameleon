@@ -9,7 +9,7 @@ from cocotb_test.simulator import run
 
 # Ignore WIDTHEXPAND warnings: https://verilator.org/guide/latest/warnings.html#cmdoption-arg-WIDTHEXPAND
 # This is when you use 4 bits but you would need 5 bits, but this is in 99.99% of the cases as intended
-BASIC_COMPILE_ARGS_DICT = {
+DEFAULT_COMPILE_ARGS_DICT = {
     "verilator": ['-Wno-WIDTHEXPAND', '-Wno-WIDTHTRUNC'],  # TODO: '--x-assign unique', '--x-initial unique'
     "questa": ['-O5']
 }
@@ -39,7 +39,7 @@ def run_module_test(module_name: str,
                     parameters : Optional[dict] = None,
                     include_src_dir: bool = False,
                     include_dirs: Optional[list] = None,
-                    use_basic_compile_args: bool = True,
+                    use_default_compile_args: bool = True,
                     compile_args: Optional[list] = None,
                     waves: bool = False,
                     defines: Optional[dict] = None,
@@ -63,7 +63,6 @@ def run_module_test(module_name: str,
     if file_name is None:
         file_name = f"{module_name}.{extension}"
 
-
     verilog_sources = verilog_sources or []
     verilog_sources.append(f"{source_dir}/{file_name}")
 
@@ -75,13 +74,13 @@ def run_module_test(module_name: str,
             for include_dir in all_include_dirs:
                 verilog_sources.extend(extract_verilog_files(include_dir))
 
-    if use_basic_compile_args:
-        basic_compile_args = BASIC_COMPILE_ARGS_DICT.get(simulator, None)
+    if use_default_compile_args:
+        default_compile_args = DEFAULT_COMPILE_ARGS_DICT.get(simulator, None)
 
-        if basic_compile_args == None:
+        if default_compile_args == None:
             raise ValueError(f"Cannot enable basic compile args for simulator ({simulator}) for which no basic compile args are defined")
     else:
-        basic_compile_args = []
+        default_compile_args = []
 
     defines_list = None
 
@@ -97,11 +96,11 @@ def run_module_test(module_name: str,
 
         waves = False
 
-    compile_args = list(set(basic_compile_args + (compile_args or [])))
+    compile_args = list(set(default_compile_args + (compile_args or [])))
 
     return run(
         simulator=simulator,
-        # Remove possible duplicate verilog source file of main module
+        # Remove possible duplicate Verilog source file of main module
         # by using list and set
         verilog_sources=list(set(verilog_sources)),
         toplevel=module_name,

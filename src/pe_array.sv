@@ -6,7 +6,8 @@ module pe_array #(
     parameter integer BIAS_BIT_WIDTH = 20,
     parameter integer SCALE_BIT_WIDTH = 4,
     parameter integer ACCUMULATION_BIT_WIDTH = 24,
-    parameter integer SUBSECTION_SIZE = 4
+    parameter integer SUBSECTION_SIZE = 4,
+    parameter integer CLAMP = 0
 ) (
     input clk,
 
@@ -75,22 +76,18 @@ module pe_array #(
         end
     end
 
-     // Generate the adder trees
-    for (genvar col = 0; col < COLS; col = col + 1) begin: gen_accumulators
-        always_comb begin
-            summed_subsection_cols[col] = 0;
-
-            for (int sub_row = 0; sub_row < SUBSECTION_SIZE; sub_row = sub_row + 1) begin
-                summed_subsection_cols[col] += $signed(pe_array_out[col][sub_row]);
-            end
-
-            summed_cols[col] = $signed(summed_subsection_cols[col]);
-
-            for (int m = SUBSECTION_SIZE; m < ROWS; m = m + 1) begin
-                summed_cols[col] += $signed(pe_array_out[col][m]);
-            end
-        end
-    end
+    pe_array_adder_tree #(
+        .PE_OUT_BIT_WIDTH(PeOutBitWidth),
+        .ADDER_TREE_OUT_BIT_WIDTH(AdderTreeOutBitWidth),
+        .SUBSECTION_SUM_BIT_WIDTH(SubsectionSumBitWidth),
+        .ROWS(ROWS),
+        .COLS(COLS),
+        .SUBSECTION_SIZE(SUBSECTION_SIZE)
+    ) pe_array_adder_tree_inst (
+        .pe_array_out(pe_array_out),
+        .summed_cols(summed_cols),
+        .summed_subsection_cols(summed_subsection_cols)
+    );
 
     // Create a 1D array of output PEs
     for (genvar l = 0; l < COLS; l = l + 1) begin: gen_sum_processors
@@ -130,9 +127,15 @@ module pe_array #(
                 if (outside_active_subsection) begin
                     out[l] = 0;
                 end else begin
-                    /* verilator lint_off WIDTHTRUNC */
-                    out[l] = accumulator >> out_scale_reg;
-                    /* verilator lint_on WIDTHTRUNC */
+                    if (CLAMP) begin
+                        /* verilator lint_off WIDTHTRUNC */
+                        out[l] = accumulator > (2**ACTIVATION_BIT_WIDTH - 1) << out_scale_reg ? (2**ACTIVATION_BIT_WIDTH - 1) : (accumulator >> out_scale_reg);
+                        /* verilator lint_on WIDTHTRUNC */
+                    end else begin
+                        /* verilator lint_off WIDTHTRUNC */
+                        out[l] = accumulator >> out_scale_reg;
+                        /* verilator lint_on WIDTHTRUNC */
+                    end
                 end
             end else begin
                 out[l] = 0;

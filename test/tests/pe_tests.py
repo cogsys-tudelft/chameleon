@@ -6,6 +6,7 @@ from cocotb.triggers import Timer
 from chameleon.core.shared_utils import twos_complement_to_int
 from chameleon.core.quant_conversions import slog2_to_int
 
+
 @cocotb.test()
 async def test_all_input_combinations(dut):
     WEIGHT_BIT_WIDTH = int(dut.WEIGHT_BIT_WIDTH)

@@ -1,15 +1,11 @@
-from pathlib import Path
-from typing import List, Optional, OrderedDict, Union, Tuple
+from typing import Dict, List, Optional, Tuple
 import math
 
 import numpy as np
 
 from asic_cells.utils import to_binary_string, chunk_list, flatten_list_of_lists
 
-from brevitas_utils import load_quant_state_dict
-
-from chameleon.core.shared_utils import flog2, clog2
-from chameleon.core.net_load_utils import get_quant_layers
+from chameleon.core.shared_utils import flog2, clog2, QuantLayers
 
 
 def twos_complement(x: int, num_bits: int):
@@ -25,7 +21,7 @@ def twos_complement(x: int, num_bits: int):
 
     if x > 2**(num_bits - 1) - 1:
         raise ValueError(f"x ({x}) is too large to represent with {num_bits} bits")
-    
+
     if x < -2**(num_bits - 1):
         raise ValueError(f"x ({x}) is too small to represent with {num_bits} bits")
 
@@ -76,7 +72,7 @@ def get_weight_rows(weight: np.ndarray, pe_array_size: int = 16, subsection_size
 
     assert input_channels % true_pe_array_size == 0, f"The number of input channels ({input_channels}) must be a multiple of {true_pe_array_size}, the PE array size or subsection size"
     assert output_channels % true_pe_array_size == 0, f"The number of output channels ({output_channels}) must be a multiple of {true_pe_array_size}, the PE array size or subsection size"
-    
+
     if subsection_weight:
         # Calculate number of chunks along each dimension
         num_chunks_x = weight.shape[0] // subsection_size
@@ -99,9 +95,9 @@ def get_weight_rows(weight: np.ndarray, pe_array_size: int = 16, subsection_size
 
     assert input_channels % true_pe_array_size == 0, "The number of input channels must be a multiple of the PE array size"
     assert output_channels % true_pe_array_size == 0, "The number of output channels must be a multiple of the PE array size"
-    
+
     rows = []
-    
+
     for output_block in range(output_channels // pe_array_size):
         for kernel in range(kernel_size):
             for input_block in range(input_channels // pe_array_size):
@@ -113,7 +109,7 @@ def get_weight_rows(weight: np.ndarray, pe_array_size: int = 16, subsection_size
                     # Apply corrections for the weight layout as required by subsection operation mode
                     sub_block = current_block[:subsection_size, :]
                     remaining = current_block[subsection_size:, :]
-                    
+
                     row = np.concatenate((sub_block.T.flatten(), remaining.T.flatten()))
 
                 rows.append(row)
@@ -165,7 +161,7 @@ def get_bias_rows(bias: np.ndarray, pe_array_size: int = 16, subsection_size: in
 
         # Convert result back to a numpy array and add zeroes at the end
         bias = np.array(result, dtype=bias.dtype)
-    
+
     channels, = bias.shape
 
     assert channels % padding_size == 0, "The number of channels must be a multiple of the PE array size"
@@ -178,7 +174,9 @@ def get_bias_rows(bias: np.ndarray, pe_array_size: int = 16, subsection_size: in
     return rows
 
 
-def get_input_blocks(inputs: np.ndarray, channels_per_block: int = 4, padding_value: Optional[int] = None) -> list[np.ndarray]:
+def get_input_blocks(inputs: np.ndarray,
+                     channels_per_block: int = 4,
+                     padding_value: Optional[int] = None) -> list[np.ndarray]:
     """Splits the input array into blocks of size `channels_per_block` and returns a list of these blocks.
 
     Parameters:
@@ -194,7 +192,8 @@ def get_input_blocks(inputs: np.ndarray, channels_per_block: int = 4, padding_va
         # Pad the input tensor with the padding value to the closest multiple of the channels per block
         channels, time_steps = inputs.shape
 
-        new_channels = math.ceil(channels / channels_per_block) * channels_per_block
+        new_channels = math.ceil(
+            channels / channels_per_block) * channels_per_block
 
         padded_inputs = np.full((new_channels, time_steps), padding_value)
         padded_inputs[:channels, :] = inputs
@@ -209,7 +208,9 @@ def get_input_blocks(inputs: np.ndarray, channels_per_block: int = 4, padding_va
 
     for t in range(time_steps):
         for output_block in range(channels // channels_per_block):
-            blocks.append(inputs[output_block*channels_per_block:(output_block+1)*channels_per_block, t])
+            blocks.append(
+                inputs[output_block * channels_per_block:(output_block + 1) *
+                       channels_per_block, t])
 
     return blocks
 
@@ -278,7 +279,7 @@ def activations_to_messages(activations: np.ndarray,
         )
 
         all_activation_messages += messages_split
-  
+
     return all_activation_messages
 
 
@@ -311,12 +312,13 @@ def get_network_config(conv_blocks: List[int],
                        max_blocks: int,
                        max_activations : int,
                        reserve_extra_linear_layer: bool = True,
-                       icl_layers_shots: Optional[Tuple[int, int]] = None,
+                       icl_settings: Optional[Dict] = None,
                        are_icl_shots_labeled: bool = False,
                        activation_memory_address: Optional[int] = None,
-                       continued_learning: Optional[bool] = False):
+                       continued_learning: Optional[bool] = False,):
     assert len(conv_kernel_sizes) == len(conv_blocks), "The number of convolutional layers must match the number of convolutional block sizes"
     assert len(conv_blocks) % 2 == 0, "The number of convolutional layers must be even"
+    assert reserve_extra_linear_layer == True, "Not sure what will happen when reserve_extra_linear_layer is set to False, need to test this more before allowing it to be set to False"
 
     num_linear_layers = len(linear_blocks)
     num_conv_and_linear_layers = len(conv_kernel_sizes) + num_linear_layers
@@ -347,7 +349,7 @@ def get_network_config(conv_blocks: List[int],
         assert max_output_address < max_activations, "One of the activations of the network will be written outside of the activation memory"
 
     blocks_per_layer = np.array(blocks_per_layer) - 1
-    
+
     assert np.min(blocks_per_layer) >= 0, "The number of blocks per layer must be non-negative"
     blocks_per_layer = list(blocks_per_layer)
 
@@ -358,18 +360,22 @@ def get_network_config(conv_blocks: List[int],
         "input_blocks_times_kernel_size": blocks_per_layer_times_kernel_size[0]
     }
 
-    if icl_layers_shots is not None:
+    if icl_settings is not None:
         assert continued_learning == None, "Continued learning and ICL layers cannot be used at the same time"
 
-        num_extra_icl_layers, icl_shots = icl_layers_shots
+        num_extra_icl_layers = icl_settings["num_extra_icl_layers"]
+        icl_padding = icl_settings["icl_padding"]
+        zsl_padding = icl_settings.get("zsl_padding", 0)
+        query_block_size = icl_settings.get("query_block_size", 0)
 
-        memory_padding = (2 if are_icl_shots_labeled else 1) * icl_shots * (blocks_per_layer[-num_extra_icl_layers-1] + 1)
+        assert icl_padding >= 0, "ICL padding cannot be negative"
 
         blocks_per_layer_times_kernel_size_cumsum = np.array(blocks_per_layer_times_kernel_size_cumsum)
-        blocks_per_layer_times_kernel_size_cumsum[num_conv_and_linear_layers-num_extra_icl_layers:] += memory_padding
+        blocks_per_layer_times_kernel_size_cumsum[num_conv_and_linear_layers-num_extra_icl_layers:] += icl_padding - query_block_size
+        blocks_per_layer_times_kernel_size_cumsum[num_conv_and_linear_layers-num_extra_icl_layers-1:] += zsl_padding
         blocks_per_layer_times_kernel_size_cumsum = list(blocks_per_layer_times_kernel_size_cumsum)
 
-        config["input_blocks_times_kernel_size_icl_head"] = (memory_padding + 1)
+        config["input_blocks_times_kernel_size_icl_head"] = (icl_padding - 1)
         config["num_conv_and_linear_layers_full_icl_net"] = num_conv_and_linear_layers
     else:
         num_extra_icl_layers = 0
@@ -385,13 +391,27 @@ def get_network_config(conv_blocks: List[int],
     return config
 
 
+def shifts_to_fit(max_value: int, input_value: int) -> int:
+    shifts = 0
+    while input_value > max_value:
+        input_value >>= 1
+        shifts += 1
+    if shifts == 0 and input_value < max_value:
+        while input_value < max_value:
+            input_value <<= 1
+            shifts -= 1
+
+        shifts += 1  # last shift made it too big
+    return shifts
+
+
 def get_few_shot_scales(shots: int, weight_bit_width: int, activation_bit_width: int, max_shots: int, few_shot_scale: Optional[int] = None, k_shot_division_scale: Optional[int] = None):
     if shots > 0:
         max_weight_value = 2**(2**(weight_bit_width-1)-1)
         max_activation_value = 2**activation_bit_width-1
 
         if few_shot_scale == None:
-            few_shot_scale = flog2(max_weight_value/max_activation_value/shots)
+            few_shot_scale = -shifts_to_fit(max_weight_value, max_activation_value*shots)
 
         left_shift_bit_width = clog2(max_activation_value*max_shots/max_weight_value)
         right_shift_bit_width = clog2(clog2(max_weight_value+1))
@@ -418,19 +438,26 @@ def get_few_shot_scales(shots: int, weight_bit_width: int, activation_bit_width:
     return few_shot_scale, (few_shot_scale_cfg_value, k_shot_division_scale)
 
 
-def get_quant_state_dict_and_layers(path_or_state_dict: Union[str, Path, OrderedDict],
-                                    slog2_weights: bool = True, scale_bit_width: int = 4,
-                                    accepted_layers: Optional[List[str]] = None,
-                                    n_last_layers_to_remove: Optional[int] = None):
+def update_last_layer_bias_after_n(layers: QuantLayers, n: int, new_bias_value: int) -> None:
+    layer = layers[-1]
 
-    if isinstance(path_or_state_dict, (str, Path)):
-        quant_state_dict = load_quant_state_dict(path_or_state_dict)
+    if len(layer) == 3:
+        weight, bias, scale = layer
+
+        if n < 0 or n > bias.shape[0]:
+            raise ValueError("n out of range")
+
+        bias[n:] = new_bias_value
+
+    elif len(layer) == 2:
+        # Residual-style structure
+        _, (branch2, _) = layer
+        weight2, bias2, scale2 = branch2
+
+        if n < 0 or n > bias2.shape[0]:
+            raise ValueError("n out of range")
+
+        bias2[n:] = new_bias_value
+
     else:
-        quant_state_dict = path_or_state_dict
-
-    quant_layers = get_quant_layers(quant_state_dict, slog2_weights, scale_bit_width, accepted_layers)
-
-    if n_last_layers_to_remove != None and n_last_layers_to_remove != 0:
-        quant_layers = quant_layers[:-n_last_layers_to_remove]
-
-    return quant_state_dict['in_quant.act_quant'], quant_layers
+        raise ValueError("Invalid layer configuration")
