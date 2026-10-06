@@ -89,3 +89,12 @@ data*
 
 wandb
 artifacts
+
+# IHP SG13G2 flow
+
+ihp_sg13g2/runs/
+ihp_sg13g2/netlist/
+
+# Python virtual environment
+
+.venv/
