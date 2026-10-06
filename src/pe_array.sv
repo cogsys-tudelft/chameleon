@@ -24,7 +24,7 @@ module pe_array #(
 `else
     input [WEIGHT_BIT_WIDTH-1:0] weights [ROWS][COLS],
 `endif
-    input signed [BIAS_BIT_WIDTH-1:0] biases [COLS],
+    input [BIAS_BIT_WIDTH-1:0] biases [COLS],  // Interpreted as signed via $signed() below
     input [SCALE_BIT_WIDTH-1:0] out_scale,
     input [SCALE_BIT_WIDTH-1:0] in_scale,
 
