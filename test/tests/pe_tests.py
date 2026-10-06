@@ -19,4 +19,6 @@ async def test_all_input_combinations(dut):
 
             await Timer(1, units='ns')
 
-            assert twos_complement_to_int(dut.out.value, dut.out.value.n_bits) == expected, f"Expected {expected} from {in_val} * {weight}, got {slog2_to_int(np.array([weight]), WEIGHT_BIT_WIDTH)[0] * in_val}"
+            actual = twos_complement_to_int(int(dut.out.value), dut.out.value.n_bits)
+
+            assert actual == expected, f"Expected {expected} from {in_val} * {weight}, got {actual}"
