@@ -38,6 +38,7 @@ transcript
 
 src/config_memory.sv
 src/pointers.v
+ihp_sg13g2/sram_lib
 
 src/tb/chameleon_config_check.sv
 src/tb/pe_array_control_tb.sv
