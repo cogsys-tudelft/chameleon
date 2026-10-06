@@ -54,7 +54,10 @@ module weight_memory_wrapper #(
             wire use_single_port = in_4x4_mode & select_this_memory;
 
 `ifndef SYNTHESIZE_FOR_SILICON
-            single_port_type_t_sram weight_memory_64_inst (
+            single_port_type_t_sram #(
+                .WIDTH(SRAM1_WIDTH),
+                .NUM_ROWS(2 ** (ADDRESS_WIDTH - 1))
+            ) weight_memory_64_inst (
 `else
             real_weight_memory_64 weight_memory_64_inst (
 `endif
@@ -76,7 +79,10 @@ module weight_memory_wrapper #(
     generate
         for (j = 0; j < 7; j = j + 1) begin
 `ifndef SYNTHESIZE_FOR_SILICON
-            single_port_type_t_sram weight_memory_128_inst (
+            single_port_type_t_sram #(
+                .WIDTH(SRAM2_WIDTH),
+                .NUM_ROWS(2 ** (ADDRESS_WIDTH - 1))
+            ) weight_memory_128_inst (
 `else
             real_weight_memory_128 weight_memory_128_inst (
 `endif
