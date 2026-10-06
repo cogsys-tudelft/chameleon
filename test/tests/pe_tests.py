@@ -15,10 +15,11 @@ async def test_all_input_combinations(dut):
         for weight in range(2**WEIGHT_BIT_WIDTH):
             getattr(dut, "in").value = in_val
             dut.weight.value = weight
-            expected = slog2_to_int(np.array([weight]), WEIGHT_BIT_WIDTH)[0] * in_val
+            true_weight = slog2_to_int(np.array([weight]), WEIGHT_BIT_WIDTH)[0]
+            expected = true_weight * in_val
 
             await Timer(1, unit='ns')
 
             actual = twos_complement_to_int(int(dut.out.value), len(dut.out.value))
 
-            assert actual == expected, f"Expected {expected} from {in_val} * {weight}, got {actual}"
+            assert actual == expected, f"Expected {expected} from {in_val} * {true_weight}, got {actual}"
