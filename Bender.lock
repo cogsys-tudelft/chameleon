@@ -1,6 +1,6 @@
 packages:
   asic-cells:
-    revision: 55a3ad9235059204f98dca678775a9d1b7e73077
+    revision: 51706fe3889ea57ebaccc8517774d8681a62612c
     version: null
     source:
       Git: git@github.com:cogsys-tudelft/asic-cells.git
