@@ -1,17 +1,24 @@
 # LibreLane configuration for synthesizing the full-size Chameleon on IHP SG13G2.
 #
 # Run from the code directory, inside LibreLane's environment, with the IHP PDK enabled:
-#   librelane --pdk ihp-sg13g2 --to Yosys.Synthesis ihp_sg13g2/config.yaml
+#   librelane --pdk ihp-sg13g2 --to OpenROAD.STAPrePNR ihp_sg13g2/config.yaml
 #
 # Requires the dependencies to be fetched (bender checkout) and the configuration
 # memory RTL to be generated (make configure) first.
 
 DESIGN_NAME: chameleon
 
-# The external clock drives all logic in simulation; the ring oscillator clock
-# generator of the original chip is not included (clk_int is tied to 0).
+# USE_FOUNDRY_SRAMS and USE_RING_OSCILLATOR are left undefined: the memory wrappers
+# use the type_t SRAMs (mapped to IHP macros below) and the ring oscillator clock
+# generator of the original chip is not included, so the external clock drives all
+# logic (clk_int is tied to 0).
+
+# 10 MHz. CLOCK_PERIOD sets the delay target of ABC during synthesis; chameleon.sdc
+# has the full constraints for STA and must use the same period.
 CLOCK_PORT: clk_ext
-CLOCK_PERIOD: 20
+CLOCK_PERIOD: 100
+PNR_SDC_FILE: dir::chameleon.sdc
+SIGNOFF_SDC_FILE: dir::chameleon.sdc
 
 VERILOG_FILES:
   # Dependencies (asic-cells and verilog-array-operations, fetched with Bender)
@@ -39,8 +46,8 @@ VERILOG_FILES:
   # Chameleon
   - dir::../src/activation_memory_wrapper.v
   - dir::../src/argmax_tree.v
-  - dir::../src/bias_memory_wrapper.v
   - dir::../src/config_memory.sv
+  - dir::../src/bias_memory_wrapper.v
   - dir::../src/convert_2d_to_1d_array_size.v
   - dir::../src/few_shot_learning_control.v
   - dir::../src/flog2.v
