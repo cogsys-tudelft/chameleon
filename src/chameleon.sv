@@ -303,6 +303,9 @@ module chameleon #(
     wire enable_pe_array_few_shot_corrected;
 
     wire signed [ACCUMULATION_BIT_WIDTH-1:0] col_accumulator[PE_COLS];
+    // Unsigned view of col_accumulator for modules with unsigned unpacked array ports (unpacked
+    // array connections require identical element types, including signedness)
+    wire [ACCUMULATION_BIT_WIDTH-1:0] col_accumulator_unsigned[PE_COLS];
 
     wire scale_and_bias_ready;
     wire [WEIGHT_BIT_WIDTH-1:0] weights[PE_ROWS][PE_COLS];
@@ -357,6 +360,7 @@ module chameleon #(
     wire [ArgmaxIndexWidth-1:0] argmax;
 
     wire [ACCUMULATION_BIT_WIDTH*PE_COLS-1:0] col_accumulator_vector_argmax;
+    wire [ACCUMULATION_BIT_WIDTH-1:0] data_gated_col_accumulator_vector_argmax_unsigned [PE_COLS];
     wire signed [ACCUMULATION_BIT_WIDTH-1:0] data_gated_col_accumulator_vector_argmax [PE_COLS];
 
     wire signed [ACCUMULATION_BIT_WIDTH-1:0] max_out_value;
@@ -1009,7 +1013,7 @@ module chameleon #(
         .SCALE_BIT_WIDTH(RightShiftFewShotScaleWidth),
         .COLS(PE_COLS)
     ) take_lsbs_of_col_accumulator (
-        .in (col_accumulator),
+        .in (col_accumulator_unsigned),
         .scale(right_shift_few_shot_scale),
         .out(col_accumulator_lsbs)
     );
@@ -1064,7 +1068,7 @@ module chameleon #(
         .BIT_WIDTH(ACCUMULATION_BIT_WIDTH),
         .COLS(PE_COLS)
     ) convert_col_accumulator_to_vector (
-        .in (col_accumulator),
+        .in (col_accumulator_unsigned),
         .out(col_accumulator_vector_argmax)
     );
 
@@ -1073,8 +1077,13 @@ module chameleon #(
         .COLS(PE_COLS)
     ) convert_col_accumulator_vector (
         .in (enable_argmax ? col_accumulator_vector_argmax : 0),
-        .out(data_gated_col_accumulator_vector_argmax)
+        .out(data_gated_col_accumulator_vector_argmax_unsigned)
     );
+
+    for (genvar i = 0; i < PE_COLS; i = i + 1) begin : gen_col_accumulator_signedness
+        assign col_accumulator_unsigned[i] = col_accumulator[i];
+        assign data_gated_col_accumulator_vector_argmax[i] = data_gated_col_accumulator_vector_argmax_unsigned[i];
+    end
 
     // Disable lint for .max() output of module since we do not care about its value
     serial_parallel_argmax #(
