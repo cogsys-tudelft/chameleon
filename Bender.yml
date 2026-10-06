@@ -54,3 +54,4 @@ sources:
       - take_lsbs_of_2d_array.v
       - weight_memory_wrapper.v
       - wide_flog2.v
+

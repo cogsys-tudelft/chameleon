@@ -213,9 +213,7 @@ module chameleon #(
     wire [LAYER_WIDTH-1:0] num_conv_and_linear_layers;
     wire [LAYER_WIDTH-1:0] num_conv_and_linear_layers_full_icl_net;
 
-`ifdef SYNTHESIZE_FOR_SILICON
     wire [6-1:0] ring_oscillator_stage_selection;
-`endif
 
     wire [KERNEL_WIDTH-1:0] kernel_size_per_layer[MAX_NUM_LAYERS:0];
     wire [BLOCKS_WIDTH-1:0] blocks_per_layer[MAX_NUM_LAYERS:0];
@@ -432,13 +430,14 @@ module chameleon #(
 
     // Clock --------------------------------------------------------------------------------------
 
-`ifdef SYNTHESIZE_FOR_SILICON
+`ifdef USE_RING_OSCILLATOR
     clock_generator_chameleon clock_generator_chameleon_inst (
         .enable(enable_clk_int),
         .stage_selection(ring_oscillator_stage_selection),
         .clk_out(clk_int)
     );
 `else
+    // Without the ring oscillator, the external clock drives all logic
     assign clk_int = 1'b0;
 `endif
 
@@ -601,11 +600,7 @@ module chameleon #(
         .enable_clock_divider (enable_clock_divider),
         .continuous_processing(continuous_processing),
 
-`ifdef SYNTHESIZE_FOR_SILICON
         .ring_oscillator_stage_selection(ring_oscillator_stage_selection),
-`else
-        .ring_oscillator_stage_selection(),
-`endif
 
         .classification(classification),
         .continued_learning(continued_learning),

@@ -20,6 +20,7 @@ module weight_memory_wrapper #(
 
     output [WIDTH-1:0] data_out
 );
+
     wire chip_enable;
     wire invert_write_enable;
     wire [WIDTH-1:0] bit_write_enable;
@@ -47,19 +48,22 @@ module weight_memory_wrapper #(
 
     assign data_out[SRAM1_OFFSET-SRAM2_WIDTH-1:0] = in_4x4_mode ? {{SRAM1_WIDTH{1'b0}}, (address_msb_delayed == 1'b0 ? data_out_4x4[SRAM1_WIDTH-1:0] : data_out_4x4[2*SRAM1_WIDTH-1:SRAM1_WIDTH])} : data_out_4x4;
 
+    // The SRAMs have half the rows of the address space: in 4x4 mode, the address MSB selects
+    // one of the two SRAM1 memories, which together store the subsection weights
     genvar i;
     generate
         for (i = 0; i < 2; i = i + 1) begin
             wire select_this_memory = address[ADDRESS_WIDTH-1] == i;
             wire use_single_port = in_4x4_mode & select_this_memory;
 
-`ifndef SYNTHESIZE_FOR_SILICON
+`ifdef USE_FOUNDRY_SRAMS
+            real_weight_memory_64 weight_memory_64_inst (
+                .PD(power_down),
+`else
             single_port_type_t_sram #(
                 .WIDTH(SRAM1_WIDTH),
                 .NUM_ROWS(2 ** (ADDRESS_WIDTH - 1))
             ) weight_memory_64_inst (
-`else
-            real_weight_memory_64 weight_memory_64_inst (
 `endif
                 .CLK(clk),
                 .CEB(in_4x4_mode ? ~(select_this_memory & chip_select) : chip_enable),
@@ -68,9 +72,6 @@ module weight_memory_wrapper #(
                 .D(use_single_port ? data_in[SRAM1_WIDTH-1:0] : data_in[SRAM1_WIDTH+(i*SRAM1_WIDTH)-1-:SRAM1_WIDTH]),
                 .M(use_single_port ? bit_write_enable[SRAM1_WIDTH-1:0] : bit_write_enable[SRAM1_WIDTH+(i*SRAM1_WIDTH)-1-:SRAM1_WIDTH]),
                 .Q(data_out_4x4[SRAM1_WIDTH+(i*SRAM1_WIDTH)-1-:SRAM1_WIDTH])
-`ifdef SYNTHESIZE_FOR_SILICON
-                        .PD(power_down),
-`endif
             );
         end
     endgenerate
@@ -78,13 +79,14 @@ module weight_memory_wrapper #(
     genvar j;
     generate
         for (j = 0; j < 7; j = j + 1) begin
-`ifndef SYNTHESIZE_FOR_SILICON
+`ifdef USE_FOUNDRY_SRAMS
+            real_weight_memory_128 weight_memory_128_inst (
+                .PD(power_down),
+`else
             single_port_type_t_sram #(
                 .WIDTH(SRAM2_WIDTH),
                 .NUM_ROWS(2 ** (ADDRESS_WIDTH - 1))
             ) weight_memory_128_inst (
-`else
-            real_weight_memory_128 weight_memory_128_inst (
 `endif
                 .CLK(clk),
                 .CEB(chip_enable),
@@ -93,11 +95,7 @@ module weight_memory_wrapper #(
                 .D(data_in[SRAM1_OFFSET+(j*SRAM2_WIDTH)-1-:SRAM2_WIDTH]),
                 .M(bit_write_enable[SRAM1_OFFSET+(j*SRAM2_WIDTH)-1-:SRAM2_WIDTH]),
                 .Q(data_out[SRAM1_OFFSET+(j*SRAM2_WIDTH)-1-:SRAM2_WIDTH])
-`ifdef SYNTHESIZE_FOR_SILICON
-                        .PD(power_down),
-`endif
             );
         end
     endgenerate
-
 endmodule
