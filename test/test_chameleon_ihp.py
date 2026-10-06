@@ -12,6 +12,8 @@ Ciel PDK root with ihp-sg13g2 enabled (default: ~/.ciel).
 
 import argparse
 import os
+import re
+from importlib.metadata import version
 from pathlib import Path
 from typing import List, Optional
 
@@ -73,9 +75,23 @@ def ihp_sram_model_sources() -> List[str]:
     return [str(source) for source in sources]
 
 
+def select_tests(tests: List[str]):
+    """Select the cocotb tests to run, by name.
+
+    cocotb 1.x reads a comma-separated list from TESTCASE. cocotb 2.x ignores TESTCASE (and then
+    runs all tests in the modules); it matches the regex COCOTB_TEST_FILTER against the full test
+    name (e.g. tests.chameleon.mnist.test_70k_tcn_mnist) instead.
+    """
+    if int(version("cocotb").split(".")[0]) >= 2:
+        os.environ.pop("TESTCASE", None)
+        os.environ["COCOTB_TEST_FILTER"] = r"(^|\.)(" + "|".join(re.escape(test) for test in tests) + r")$"
+    else:
+        os.environ.pop("COCOTB_TEST_FILTER", None)
+        os.environ["TESTCASE"] = ",".join(tests)
+
+
 def run_system_tests(mode: str, sim_build: str, tests: Optional[List[str]] = None, waves: bool = False):
-    tests = tests or SYSTEM_TESTS
-    os.environ["TESTCASE"] = ",".join(tests)
+    select_tests(tests or SYSTEM_TESTS)
 
     include_dirs = [f"../deps/asic-cells/src/{d}" for d in ASIC_CELLS_DIRS]
     include_dirs.append("../deps/verilog-array-operations/src")
