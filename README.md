@@ -34,7 +34,7 @@ Run: `bender update` to install the necessary Verilog dependencies. Always run `
 
 ### Python
 
-To use only the core Python code from Chameleon, simply run `pip install .` from the project root. If you also want to use the FPGA bridge code, run `pip install . [fpga_bridge]`. Finally, if you want to run the simulation code, run `pip install . [sim]`.
+To use only the core Python code from Chameleon, simply run `pip install .` from the project root. If you also want to use the FPGA bridge code, run `pip install ".[fpga_bridge]"`. If you also want to test the design, run `pip install ".[test]"`. Finally, if you want to run the simulation code, run `pip install ".[sim]"`.
 
 ## Testing
 
