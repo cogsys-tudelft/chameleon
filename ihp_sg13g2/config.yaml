@@ -1,0 +1,107 @@
+# LibreLane configuration for synthesizing the full-size Chameleon on IHP SG13G2.
+#
+# Run from the code directory, inside LibreLane's environment, with the IHP PDK enabled:
+#   librelane --pdk ihp-sg13g2 --to Yosys.Synthesis ihp_sg13g2/config.yaml
+#
+# Requires the dependencies to be fetched (bender checkout) and the configuration
+# memory RTL to be generated (make configure) first.
+
+DESIGN_NAME: chameleon
+
+# The external clock drives all logic in simulation; the ring oscillator clock
+# generator of the original chip is not included (clk_int is tied to 0).
+CLOCK_PORT: clk_ext
+CLOCK_PERIOD: 20
+
+VERILOG_FILES:
+  # Dependencies (asic-cells and verilog-array-operations, fetched with Bender)
+  - dir::../deps/asic-cells/src/aer/high_speed_in_bus.v
+  - dir::../deps/asic-cells/src/aer/high_speed_out_bus.v
+  - dir::../deps/asic-cells/src/clock/clock_divider.v
+  - dir::../deps/asic-cells/src/clock/ext_or_int_clock.v
+  - dir::../deps/asic-cells/src/clock/frequency_divider_stage.v
+  - dir::../deps/asic-cells/src/clock_domain_crossing/double_flop_synchronizer.v
+  - dir::../deps/asic-cells/src/clock_domain_crossing/triple_flop_toggle_synchronizer.v
+  - dir::../deps/asic-cells/src/pipeline/delay_register.v
+  - dir::../deps/asic-cells/src/pipeline/double_delay_register.v
+  - dir::../deps/asic-cells/src/pipeline/wide_delay_register.v
+  - dir::../deps/asic-cells/src/pipeline/wide_double_delay_register.v
+  - dir::../deps/asic-cells/src/spi_interface/memory_manager.v
+  - dir::../deps/asic-cells/src/spi_interface/spi_client.sv
+  - dir::../deps/asic-cells/src/spi_interface/spi_clock_barrier_crossing.v
+  - dir::../deps/verilog-array-operations/src/convert_1d_to_2d_array.v
+  - dir::../deps/verilog-array-operations/src/convert_1d_to_3d_sub_array.v
+  - dir::../deps/verilog-array-operations/src/convert_2d_to_1d_array.v
+  # IHP SG13G2 SRAMs (replace the behavioral models in asic-cells/src/sram)
+  - dir::../src/ihp_sg13g2/ihp_sg13g2_sram_macro.sv
+  - dir::../src/ihp_sg13g2/single_port_type_t_sram.sv
+  - dir::../src/ihp_sg13g2/double_port_type_t_sram.sv
+  # Chameleon
+  - dir::../src/activation_memory_wrapper.v
+  - dir::../src/argmax_tree.v
+  - dir::../src/bias_memory_wrapper.v
+  - dir::../src/config_memory.sv
+  - dir::../src/convert_2d_to_1d_array_size.v
+  - dir::../src/few_shot_learning_control.v
+  - dir::../src/flog2.v
+  - dir::../src/fsm.v
+  - dir::../src/global_sram_power_down_controller.v
+  - dir::../src/input_memory.v
+  - dir::../src/managed_activation_memory.v
+  - dir::../src/managed_bias_memory.v
+  - dir::../src/managed_input_memory.v
+  - dir::../src/managed_weight_memory.v
+  - dir::../src/pe.v
+  - dir::../src/pe_array.sv
+  - dir::../src/pe_array_adder_tree.v
+  - dir::../src/pe_array_control.sv
+  - dir::../src/pointers.v
+  - dir::../src/serial_parallel_argmax.v
+  - dir::../src/squared_log2_sum_accumulator.v
+  - dir::../src/take_lsbs_of_2d_array.v
+  - dir::../src/weight_memory_wrapper.v
+  - dir::../src/wide_flog2.v
+  - dir::../src/chameleon.sv
+
+VERILOG_INCLUDE_DIRS:
+  - dir::../src
+  - dir::../src/ihp_sg13g2
+  - dir::../deps/asic-cells/src/pipeline
+
+# Slang parses the SystemVerilog; a single compilation unit makes the include
+# guards work across files (some files are both included and listed above)
+USE_SLANG: true
+SLANG_ARGUMENTS:
+  - --single-unit
+
+# The Verilator linter does not know the SRAM macros; Slang does the checking
+RUN_LINTER: false
+
+MACROS:
+  RM_IHPSG13_1P_512x64_c2_bm_bist:
+    gds:
+      - pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_1P_512x64_c2_bm_bist.gds
+    lef:
+      - pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_512x64_c2_bm_bist.lef
+    lib:
+      "*_typ_*": pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x64_c2_bm_bist_typ_1p20V_25C.lib
+      "*_fast_*": pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x64_c2_bm_bist_fast_1p32V_m55C.lib
+      "*_slow_*": pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x64_c2_bm_bist_slow_1p08V_125C.lib
+  RM_IHPSG13_1P_256x32_c2_bm_bist:
+    gds:
+      - pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_1P_256x32_c2_bm_bist.gds
+    lef:
+      - pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_256x32_c2_bm_bist.lef
+    lib:
+      "*_typ_*": pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x32_c2_bm_bist_typ_1p20V_25C.lib
+      "*_fast_*": pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x32_c2_bm_bist_fast_1p32V_m55C.lib
+      "*_slow_*": pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x32_c2_bm_bist_slow_1p08V_125C.lib
+  RM_IHPSG13_2P_256x32_c2_bm_bist:
+    gds:
+      - pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_2P_256x32_c2_bm_bist.gds
+    lef:
+      - pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_2P_256x32_c2_bm_bist.lef
+    lib:
+      "*_typ_*": pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_2P_256x32_c2_bm_bist_typ_1p20V_25C.lib
+      "*_fast_*": pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_2P_256x32_c2_bm_bist_fast_1p32V_m55C.lib
+      "*_slow_*": pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_2P_256x32_c2_bm_bist_slow_1p08V_125C.lib
