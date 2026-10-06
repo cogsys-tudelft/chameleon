@@ -29,9 +29,9 @@ packages = ["chameleon"]
 [project.optional-dependencies]
 test = [
     "pytest==7.4.3",
-    # With cocotb 1.8, outputs of Verilator 5.044 models never update; 1.9 works
-    "cocotb==1.9.2",
-    "cocotb-test==0.2.6",
+    # With cocotb 1.8, outputs of Verilator 5.044 models never update; 1.9+ works
+    "cocotb==2.1.0",
+    "cocotb-test==0.3.0",
     "torch_mate @ git+https://github.com/V0XNIHILI/torch-mate.git@main"
 ]
 torch = [

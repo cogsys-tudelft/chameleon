@@ -23,7 +23,7 @@ def get_params_and_controller(dut, cfg_memory_file: str, pointer_file: str):
 
     if not is_struct:
         for arg in ChameleonParams.__annotations__:
-            param_args[arg] = int(getattr(dut, arg))
+            param_args[arg] = int(getattr(dut, arg).value)
 
         params = ChameleonParams(**param_args)
     else:

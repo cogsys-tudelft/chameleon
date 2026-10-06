@@ -49,14 +49,14 @@ class ChameleonSimController(ChameleonInterface):
         cocotb.log.info(msg)
 
     async def sleep(self, duration: float):
-        await Timer(duration, units='ms')
+        await Timer(duration, unit='ms')
 
     def set_asic_inputs(self, **kwargs):
         for key, value in kwargs.items():
             self.get_pin(key).value = value
 
     def get_asic_outputs(self, *args):
-        outputs = [self.get_pin(arg).value.integer for arg in args]
+        outputs = [int(self.get_pin(arg).value) for arg in args]
 
         if len(outputs) == 1:
             return outputs[0]
@@ -79,18 +79,18 @@ class ChameleonSimController(ChameleonInterface):
             response = 0
 
             for bit in message:
-                await Timer(self.spi_half_clock, units='ns')
+                await Timer(self.spi_half_clock, unit='ns')
                 SCK.value = 0
                 MOSI.value = int(bit)
 
-                await Timer(self.spi_half_clock, units='ns')
+                await Timer(self.spi_half_clock, unit='ns')
                 SCK.value = 1
                 response = (response << 1) | int(MISO.value)
             
             responses.append(response)
 
         # Set clock back to zero and leave it there
-        await Timer(self.spi_half_clock, units='ns')
+        await Timer(self.spi_half_clock, unit='ns')
 
         # Set SPI wires to zero
         MOSI.value = 0
@@ -108,7 +108,7 @@ class ChameleonSimController(ChameleonInterface):
 
             self.clk_period = 1 / cycles * 1e9
 
-            cocotb.start_soon(Clock(clk_ext, self.clk_period, units="ns").start())
+            cocotb.start_soon(Clock(clk_ext, self.clk_period, unit="ns").start())
         else:
             clk_ext.value = 0
 

@@ -15,19 +15,19 @@ from chameleon.core.numpy.tcn import fc
 async def test_all_ops_for_multiple_steps(dut):
     np.random.seed(2)
 
-    WEIGHT_BIT_WIDTH = int(dut.WEIGHT_BIT_WIDTH)
-    ACTIVATION_BIT_WIDTH = int(dut.ACTIVATION_BIT_WIDTH)
-    BIAS_BIT_WIDTH = int(dut.BIAS_BIT_WIDTH)
-    SUBSECTION_SIZE = int(dut.SUBSECTION_SIZE)
-    ACCUMULATION_BIT_WIDTH = int(dut.ACCUMULATION_BIT_WIDTH)
-    COLS = int(dut.COLS)
-    ROWS = int(dut.ROWS)
-    CLAMP = int(dut.CLAMP)
-    SCALE_BIT_WIDTH = int(dut.SCALE_BIT_WIDTH)
+    WEIGHT_BIT_WIDTH = int(dut.WEIGHT_BIT_WIDTH.value)
+    ACTIVATION_BIT_WIDTH = int(dut.ACTIVATION_BIT_WIDTH.value)
+    BIAS_BIT_WIDTH = int(dut.BIAS_BIT_WIDTH.value)
+    SUBSECTION_SIZE = int(dut.SUBSECTION_SIZE.value)
+    ACCUMULATION_BIT_WIDTH = int(dut.ACCUMULATION_BIT_WIDTH.value)
+    COLS = int(dut.COLS.value)
+    ROWS = int(dut.ROWS.value)
+    CLAMP = int(dut.CLAMP.value)
+    SCALE_BIT_WIDTH = int(dut.SCALE_BIT_WIDTH.value)
 
     max_steps = 64
 
-    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
 
     await FallingEdge(dut.clk)
 
