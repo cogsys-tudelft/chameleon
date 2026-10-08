@@ -75,8 +75,7 @@ passed.txt
 
 # Datasets
 
-/data*
-data*
+data/*
 
 # VSCode
 
@@ -99,3 +98,7 @@ ihp_sg13g2/netlist/
 # Python virtual environment
 
 .venv/
+
+# Unignore
+
+!datasets/sc12/sc12_test_samples_28d_melspec.pkl
