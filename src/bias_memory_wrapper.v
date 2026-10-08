@@ -17,23 +17,7 @@ module bias_memory_wrapper #(
     output [WIDTH-1:0] data_out
 );
 
-`ifndef SYNTHESIZE_FOR_SILICON
-    single_port_type_t_sram #(
-        .WIDTH(WIDTH),
-        .NUM_ROWS(NUM_ROWS)
-    ) bias_memory_inst (
-        .CLK(clk),
-
-        .A(address),
-        .D(data_in),
-        .M(~mask),
-
-        .CEB(~chip_select),
-        .WEB(~write_enable),
-
-        .Q(data_out)
-    );
-`else
+`ifdef USE_FOUNDRY_SRAMS
     real_bias_memory bias_memory_inst (
         .CLK(clk),
 
@@ -49,6 +33,22 @@ module bias_memory_wrapper #(
         .Q(data_out),
 
         .PD_B1(power_down_small_bias)
+    );
+`else
+    single_port_type_t_sram #(
+        .WIDTH(WIDTH),
+        .NUM_ROWS(NUM_ROWS)
+    ) bias_memory_inst (
+        .CLK(clk),
+
+        .A(address),
+        .D(data_in),
+        .M(~mask),
+
+        .CEB(~chip_select),
+        .WEB(~write_enable),
+
+        .Q(data_out)
     );
 `endif
 

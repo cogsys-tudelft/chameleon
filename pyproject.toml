@@ -16,7 +16,7 @@ keywords = ["accelerator", "compiler", "meta-learning", "edge AI", "edge", "zcu1
 dependencies = [
   'numpy',
   'asic-cells @ git+https://github.com/cogsys-tudelft/asic-cells.git@main',
-  'brevitas_utils @ git+https://github.com/cogsys-tudelft/brevitas_utils.git@main'
+  'brevitas_utils @ git+https://github.com/V0XNIHILI/brevitas-utils.git@main'
 ]
 
 [build-system]
@@ -29,8 +29,10 @@ packages = ["chameleon"]
 [project.optional-dependencies]
 test = [
     "pytest==7.4.3",
-    "cocotb==1.8.1",
-    "cocotb-test==0.2.4"
+    # With cocotb 1.8, outputs of Verilator 5.044 models never update; 1.9+ works
+    "cocotb==2.1.0",
+    "cocotb-test==0.3.0",
+    "torch_mate @ git+https://github.com/V0XNIHILI/torch-mate.git@main"
 ]
 torch = [
     "torch==2.2.0+cpu",

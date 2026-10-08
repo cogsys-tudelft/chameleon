@@ -16,23 +16,7 @@ module activation_memory_wrapper #(
     output [WIDTH-1:0] data_out
 );
 
-`ifndef SYNTHESIZE_FOR_SILICON
-    double_port_type_t_sram #(
-        .WIDTH(WIDTH),
-        .NUM_ROWS(NUM_ROWS)
-    ) activation_memory_inst (
-        .CLK(clk),
-
-        .REB(~read_enable),
-        .WEB(~write_enable),
-        .AA (address_write),
-        .AB (address_read),
-
-        .D(data_in),
-        .M(~mask),
-        .Q(data_out)
-    );
-`else
+`ifdef USE_FOUNDRY_SRAMS
     real_activation_memory activation_memory_inst (
         .CLK(clk),
 
@@ -46,6 +30,22 @@ module activation_memory_wrapper #(
         .REB(read_enable),
         .WEB(write_enable),
 
+        .Q(data_out)
+    );
+`else
+    double_port_type_t_sram #(
+        .WIDTH(WIDTH),
+        .NUM_ROWS(NUM_ROWS)
+    ) activation_memory_inst (
+        .CLK(clk),
+
+        .REB(~read_enable),
+        .WEB(~write_enable),
+        .AA (address_write),
+        .AB (address_read),
+
+        .D(data_in),
+        .M(~mask),
         .Q(data_out)
     );
 `endif

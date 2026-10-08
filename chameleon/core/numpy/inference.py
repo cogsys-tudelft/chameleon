@@ -5,8 +5,7 @@ import numpy as np
 
 from tqdm import tqdm
 
-from chameleon.core.net_load_utils import get_quant_input
-from chameleon.core.net_transfer_utils import get_quant_state_dict_and_layers
+from chameleon.core.net_load_utils import get_quant_input, get_quant_in_and_layers
 from chameleon.core.numpy.tcn import tcn_network
 
 
@@ -21,18 +20,20 @@ def infer(
     scale_bit_width: int = 4,
     accepted_layers: Optional[List[str]] = None,
     n_last_layers_to_remove: Optional[int] = None,
-    clip: bool = True,
+    clip_input: bool = True,
+    force_downsample_scale_compatibility: bool = False,
     pad: str = "pre",
 ):
     count = 0
     embeds = []
     preds_and_targets = []
 
-    in_quant, quant_layers = get_quant_state_dict_and_layers(
+    in_quant, quant_layers = get_quant_in_and_layers(
         net_path,
         scale_bit_width=scale_bit_width,
         accepted_layers=accepted_layers,
         n_last_layers_to_remove=n_last_layers_to_remove,
+        force_downsample_scale_compatibility=force_downsample_scale_compatibility
     )
 
     if not limit_samples:
@@ -45,7 +46,7 @@ def infer(
     ):
         x, y = dataset[i]
 
-        x = get_quant_input(x, quant_layers, in_quant, clip=clip, pad=pad)
+        x = get_quant_input(x, quant_layers, in_quant, clip=clip_input, pad=pad)
 
         embed_out, _, accum_out = tcn_network(
             x,

@@ -1,19 +1,14 @@
 import numpy as np
 
 from chameleon.core.quant_conversions import slog2_to_int
+from chameleon.core.shared_utils import left_right_shift
 
 
-def left_right_shift(x: np.ndarray, shift: int, pos_is_left: bool = True):
-    shift = shift if pos_is_left else -shift
-
-    if shift >= 0:
-        return np.left_shift(x, shift)
+def compute_expected_weight_and_bias(ways: list[np.ndarray], weight_bit_width: int, few_shot_scale: int, use_l2_for_few_shot: bool, accumulation_bit_width: int = -1, log2_embeds: bool = True):
+    if log2_embeds:
+        ways_arr = slog2_to_int(np.array(ways), weight_bit_width)
     else:
-        return np.right_shift(x, -shift)
-
-
-def compute_expected_weight_and_bias(ways: list[np.ndarray], weight_bit_width: int, few_shot_scale: int, use_l2_for_few_shot: bool, accumulation_bit_width: int = -1):
-    ways_arr = slog2_to_int(np.array(ways), weight_bit_width)
+        ways_arr = np.array(ways, dtype=int)
 
     if use_l2_for_few_shot:
         bias = np.sum(ways_arr**2, axis=1)
@@ -53,8 +48,8 @@ def get_subsection_blocks_1d(array: np.ndarray, block_size: int, stride: int):
 
     # Iterate over the array to extract blocks
     for i in range(0, array.shape[0] - block_size + 1, stride):
-            block = array[i:i + block_size]
-            isz = block_size*(i//stride)
-            reconstructed_array[isz:isz + block_size] = block
+        block = array[i:i + block_size]
+        isz = block_size*(i//stride)
+        reconstructed_array[isz:isz + block_size] = block
 
-    return reconstructed_array 
+    return reconstructed_array

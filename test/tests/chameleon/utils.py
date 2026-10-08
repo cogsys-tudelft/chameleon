@@ -1,6 +1,9 @@
-from typing import Optional, Tuple, Union
+from typing import Dict, Optional, Tuple, Union
 import inspect
 
+from torch_mate.data.utils import FewShot
+
+from chameleon.core.shared_utils import QuantLayers
 from chameleon.sim.chameleon_sim_controller import ChameleonSimController
 from chameleon.core.chameleon_interface import ChameleonParams
 
@@ -20,7 +23,7 @@ def get_params_and_controller(dut, cfg_memory_file: str, pointer_file: str):
 
     if not is_struct:
         for arg in ChameleonParams.__annotations__:
-            param_args[arg] = int(getattr(dut, arg))
+            param_args[arg] = int(getattr(dut, arg).value)
 
         params = ChameleonParams(**param_args)
     else:
@@ -103,7 +106,7 @@ async def verify_net_structure(dut,
 async def learn_with_few_shots(dut,
                                     cfg_memory_file: str,
                                     pointer_file: str,
-                                    dataset,
+                                    few_shot_dataset: FewShot,
                                     shots: int,
                                     query_shots: int,
                                     ways: int,
@@ -113,33 +116,39 @@ async def learn_with_few_shots(dut,
                                     expected_accuracies: Tuple[float, float],
                                     quant_state_dict_file_path: str,
                                     n_last_layers_to_remove: Optional[int] = None,
+                                    n_last_layers_to_remove_query: Optional[int] = None,
                                     require_single_chunk: bool = False,
                                     seed: int = 0,
                                     l2_options: Union[str, bool] = 'both',
                                     check_memory_contents: bool = True,
                                     in_subsection_mode: bool = False,
-                                    icl_shots: int = 0,
-                                    are_icl_shots_labeled: bool = False):
+                                    quant_icl_layers: Optional[Union[QuantLayers, Dict]] = None,
+                                    are_icl_shots_labeled: bool = False,
+                                    icl_classification_options: Optional[Union[str, bool]] = None,
+                                    query_sample_embedder_quant_state_dict_file_path: Optional[str] = None):
     _, c = get_params_and_controller(dut, cfg_memory_file, pointer_file)
     await c.start_and_verify_asic(1, clock_freq, reset_host=False, verify_memories=False)
-
+    c.verbose = True
     await c.learn_with_few_shots(
-        dataset,
-        shots,
-        query_shots,
-        ways,
-        num_batches,
-        ways_for_continued_learning,
-        expected_accuracies,
-        quant_state_dict_file_path,
-        n_last_layers_to_remove,
-        require_single_chunk,
-        seed,
-        l2_options,
-        check_memory_contents,
-        in_subsection_mode,
-        icl_shots,
-        are_icl_shots_labeled
+        few_shot_dataset=few_shot_dataset,
+        shots=shots,
+        query_shots=query_shots,
+        ways=ways,
+        num_batches=num_batches,
+        ways_for_continued_learning=ways_for_continued_learning,
+        expected_accuracies=expected_accuracies,
+        quant_state_dict_file_path=quant_state_dict_file_path,
+        n_last_layers_to_remove=n_last_layers_to_remove,
+        n_last_layers_to_remove_query=n_last_layers_to_remove_query,
+        require_single_chunk=require_single_chunk,
+        seed=seed,
+        l2_options=l2_options,
+        check_memory_contents=check_memory_contents,
+        in_subsection_mode=in_subsection_mode,
+        quant_icl_layers=quant_icl_layers,
+        are_icl_shots_labeled=are_icl_shots_labeled,
+        icl_classification_options=icl_classification_options,
+        query_sample_embedder_quant_state_dict_file_path=query_sample_embedder_quant_state_dict_file_path
     )
 
     with open(PASSED_TEST_FILE_NAME, "a") as f:

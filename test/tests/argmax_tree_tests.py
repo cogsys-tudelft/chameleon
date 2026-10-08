@@ -12,8 +12,8 @@ RANDOM_SEED = 4
 async def test_argmax_tree(dut):
     np.random.seed(RANDOM_SEED)
 
-    WIDTH = int(dut.WIDTH)
-    N = int(dut.N)
+    WIDTH = int(dut.WIDTH.value)
+    N = int(dut.N.value)
 
     for i in range(NUM_TEST_CASES+1):
         if i == 0:
@@ -25,7 +25,7 @@ async def test_argmax_tree(dut):
 
         dut.data.value = data.tolist()
         
-        await Timer(1, units='ns')
+        await Timer(1, unit='ns')
 
         expected_argmax = np.argmax(data)
         actual_argmax = int(dut.argmax.value)

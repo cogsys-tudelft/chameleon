@@ -3,7 +3,7 @@ from typing import Union, List
 import numpy as np
 
 from chameleon.core.quant_conversions import slog2_to_int
-from chameleon.core.shared_utils import QuantLayers
+from chameleon.core.shared_utils import QuantLayers, left_right_shift
 
 
 def get_receptive_field_size(kernel_size: Union[int, List[int]],
@@ -37,9 +37,11 @@ def relu_and_scale(input_tensor: np.ndarray, scale: int, max_activation_value: i
         assert input_tensor.max() < max_accumulation_value
         assert input_tensor.min() >= -max_accumulation_value
 
-    # If scale is -1, we do not have output quantization
+    # If scale is -1, we do not have an output activation and thus also no quantization
     if scale == -1:
         return input_tensor
+
+    assert scale >= 0, "Only right shifts are supported for scaling activations"
 
     out = np.maximum(input_tensor, 0)
     out = np.right_shift(out, scale)
@@ -55,8 +57,8 @@ def temporal_conv1d(input_tensor: np.ndarray, weight_tensor: np.ndarray, dilatio
     output_channels, input_channels, kernel_size = weight_tensor.shape
     data_input_channels, length = input_tensor.shape
 
-    assert data_input_channels == input_channels
-    assert length >= kernel_size
+    assert data_input_channels == input_channels, f"Input tensor has {data_input_channels} channels but weight tensor expects {input_channels}"
+    assert length >= kernel_size, f"Input tensor length {length} is smaller than kernel size {kernel_size}"
 
     effective_kernel_size = (kernel_size-1)*(dilation-1)+kernel_size
     output_length = length-effective_kernel_size
@@ -69,12 +71,12 @@ def temporal_conv1d(input_tensor: np.ndarray, weight_tensor: np.ndarray, dilatio
         output_tensor[start_idx//dilation] = np.tensordot(weight_tensor, input_tensor[:, start_idx:start_idx+kernel_size*dilation:dilation], axes=2)
 
     output_tensor = output_tensor.T
-    
+
     # Add (dilation-1) number of zeros between each output timestep
-                    
+
     if dilation == 1:
         return output_tensor
-                    
+
     dilated_output_tensor = np.zeros((output_channels, output_length+(dilation-1)*(output_length-1)), dtype=input_tensor.dtype)
 
     count = 0
@@ -111,6 +113,8 @@ def conv_1x1(input_tensor: np.ndarray, weight_tensor: np.ndarray) -> np.ndarray:
 
 
 def fc(input_tensor: np.ndarray, weight_tensor: np.ndarray):
+    # input_tensor shape: (input_channels, 1)
+    # weight_tensor shape: (output_channels, input_channels)
     assert input_tensor.shape[1] == 1, "Only a single timestep can be fed into a linear layer"
 
     return conv_1x1(input_tensor, np.expand_dims(weight_tensor, 2))
@@ -128,7 +132,10 @@ def tcn_layer(input_tensor: np.ndarray, weight_tensor1: np.ndarray, weight_tenso
     intermediate_tensor = temporal_conv1d_bias_relu(input_tensor, weight_tensor1, bias1, scale1, max_activation_value, max_accumulation_value, dilation)
     output_tensor = temporal_conv1d(intermediate_tensor, weight_tensor2, dilation) + np.expand_dims(bias2, 1)
     residual_tensor = conv_1x1(input_tensor, downsample_tensor) if downsample_tensor is not None else input_tensor
-    output_tensor += (np.right_shift if scale_res < 0 else np.left_shift)(residual_tensor[:, -output_tensor.shape[1]:], abs(scale_res))
+
+    assert scale_res >= 0, "Only left shifts are supported for scaling the residual connection"
+
+    output_tensor += left_right_shift(residual_tensor[:, -output_tensor.shape[1]:], scale_res)
 
     return relu_and_scale(output_tensor, scale2, max_activation_value, max_accumulation_value), intermediate_tensor, output_tensor
 
@@ -137,7 +144,7 @@ def tcn_network(input_tensor: np.ndarray,
                 layers: QuantLayers,
                 weight_bit_width: int = 4,
                 act_bit_width: int = 4,
-                accum_bit_width: int = 20,
+                accum_bit_width: int = 18,
                 slog2_weights: bool = True):
     intermediate_tensors = []
     unscaled_output_tensor = None

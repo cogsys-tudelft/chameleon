@@ -8,7 +8,8 @@ package:
   authors: ["Douwe den Blanken <douwedb@gmail.com>"]
 
 dependencies:
-  asic-cells: { git: "git@github.com:cogsys-tudelft/asic-cells.git", rev: main }
+  # The IHP SG13G2 target provides its own type_t SRAMs, so the behavioral ones are left out
+  asic-cells: { git: "git@github.com:cogsys-tudelft/asic-cells.git", rev: main, pass_targets: [{ target: ihp_sg13g2, pass: custom_sram }] }
   verilog-array-operations: { git: "git@github.com:V0XNIHILI/verilog-array-operations.git", rev: main }
 
 # Additional workspace configuration. Optional.
@@ -26,31 +27,64 @@ workspace:
 frozen: false
 
 # List of source files in this package. Optional.
+#
+# Targets select the technology:
+# - (none):      behavioral SRAMs from asic-cells, no ring oscillator (RTL simulation)
+# - ihp_sg13g2:  SRAMs mapped to IHP SG13G2 macros, no ring oscillator
+# - foundry:     the foundry SRAM macros (real_*_memory) and the ring oscillator clock
+#                generator; both are proprietary and not part of this package
+#
+# config_memory.sv and pointers.v are generated from the JSON files with `make configure`.
 sources:
   - target: rtl
+    include_dirs:
+      - src
     files:
-      - activation_memory_wrapper.v
-      - argmax_tree.v
-      - bias_memory_wrapper.v
-      - chameleon.sv
-      - config_memory.json
-      - convert_2d_to_1d_array_size.v
-      - few_shot_learning_control.v
-      - flog2.v
-      - fsm.v
-      - global_sram_power_down_controller.v
-      - input_memory.v
-      - managed_activation_memory.v
-      - managed_bias_memory.v
-      - managed_input_memory.v
-      - managed_weight_memory.v
-      - pe.v
-      - pe_array.sv
-      - pe_array_control.sv
-      - pointers.json
-      - serial_parallel_argmax.v
-      - squared_log2_sum_accumulator.v
-      - states.vh
-      - take_lsbs_of_2d_array.v
-      - weight_memory_wrapper.v
-      - wide_flog2.v
+      # IHP SG13G2 SRAMs, which replace the behavioral single/double_port_type_t_sram
+      - target: ihp_sg13g2
+        include_dirs:
+          - src/ihp_sg13g2
+        files:
+          - src/ihp_sg13g2/ihp_sg13g2_sram_macro.sv
+          - src/ihp_sg13g2/single_port_type_t_sram.sv
+          - src/ihp_sg13g2/double_port_type_t_sram.sv
+
+      - src/argmax_tree.v
+      - src/config_memory.sv
+      - src/convert_2d_to_1d_array_size.v
+      - src/few_shot_learning_control.v
+      - src/flog2.v
+      - src/fsm.v
+      - src/global_sram_power_down_controller.v
+      - src/input_memory.v
+      - src/managed_activation_memory.v
+      - src/managed_bias_memory.v
+      - src/managed_input_memory.v
+      - src/managed_weight_memory.v
+      - src/pe.v
+      - src/pe_array.sv
+      - src/pe_array_adder_tree.v
+      - src/pe_array_control.sv
+      - src/pointers.v
+      - src/serial_parallel_argmax.v
+      - src/squared_log2_sum_accumulator.v
+      - src/take_lsbs_of_2d_array.v
+      - src/wide_flog2.v
+
+      # Files that switch between technologies with USE_FOUNDRY_SRAMS (memory wrappers)
+      # and USE_RING_OSCILLATOR (chameleon)
+      - target: not(foundry)
+        files:
+          - src/activation_memory_wrapper.v
+          - src/bias_memory_wrapper.v
+          - src/weight_memory_wrapper.v
+          - src/chameleon.sv
+      - target: foundry
+        defines:
+          USE_FOUNDRY_SRAMS: ~
+          USE_RING_OSCILLATOR: ~
+        files:
+          - src/activation_memory_wrapper.v
+          - src/bias_memory_wrapper.v
+          - src/weight_memory_wrapper.v
+          - src/chameleon.sv

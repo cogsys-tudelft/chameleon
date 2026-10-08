@@ -38,6 +38,7 @@ transcript
 
 src/config_memory.sv
 src/pointers.v
+ihp_sg13g2/sram_lib
 
 src/tb/chameleon_config_check.sv
 src/tb/pe_array_control_tb.sv
@@ -74,8 +75,7 @@ passed.txt
 
 # Datasets
 
-/data*
-data*
+data/*
 
 # VSCode
 
@@ -88,3 +88,17 @@ data*
 # WandB
 
 wandb
+artifacts
+
+# IHP SG13G2 flow
+
+ihp_sg13g2/runs/
+ihp_sg13g2/netlist/
+
+# Python virtual environment
+
+.venv/
+
+# Unignore
+
+!datasets/sc12/sc12_test_samples_28d_melspec.pkl

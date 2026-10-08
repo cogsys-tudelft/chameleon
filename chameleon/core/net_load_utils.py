@@ -1,16 +1,18 @@
+from pathlib import Path
 from collections import OrderedDict
-from typing import List, Optional, Dict, Union
+from typing import List, Optional, Dict, Union, OrderedDict
 import random
 import math
 
 import numpy as np
 import numpy.testing as npt
 
+from brevitas_utils import load_quant_state_dict
 from asic_cells.utils import chunk_list
 
 from chameleon.core.shared_utils import clog2, QuantLayers
 from chameleon.core.numpy.tcn import fc, temporal_conv1d, tcn_network, get_receptive_field_size
-from chameleon.core.quant_conversions import slog2_to_int, float_to_int, float_to_slog2, float_to_uint
+from chameleon.core.quant_conversions import int_to_slog2, slog2_to_int, float_to_int, float_to_slog2, float_to_uint
 
 
 def get_true_weight_bit_width(bit_width: int, slog2_weights: bool):
@@ -24,10 +26,19 @@ def get_true_weight_bit_width(bit_width: int, slog2_weights: bool):
 def get_quant_layers(quant_state_dict: OrderedDict,
                      slog2_weights: bool = True,
                      scale_bit_width: int = 4,
-                     accepted_layers: Optional[List[str]] = None) -> QuantLayers:
+                     accepted_layers: Optional[List[str]] = None,
+                     clip_biases: bool = False,
+                     force_downsample_scale_compatibility: bool = False,
+                     in_quant: Optional[Dict] = None) -> QuantLayers:
     # Split the state dict into activations and weights and biases
     activations = {}
     weights_and_biases = {}
+
+    if in_quant is not None:
+        if 'in_quant.act_quant' in quant_state_dict:
+            raise ValueError("Cannot override provided input quantization")
+
+        activations['in_quant.act_quant'] = in_quant
 
     for name, properties in quant_state_dict.items():
         if name.endswith('.act_quant'):
@@ -45,7 +56,7 @@ def get_quant_layers(quant_state_dict: OrderedDict,
         weight = properties['weight']
         weight_scale = weight['scale']
         weight_value = weight['value']
-        
+
         assert weight['signed'], "Only signed weights are supported for now"
         assert weight['zero_point'] == 0.0, "Only a zero point of 0 from a weight is supported for now"
 
@@ -71,13 +82,13 @@ def get_quant_layers(quant_state_dict: OrderedDict,
             downsample_params[-1] = entry
         else:
             raise ValueError(f"Unknown layer type: {name}")
-        
+
     zero_corrected_biases = []
     output_corrected_scales = []
-    downsample_scale_ratios = []
+    scale_res = []
     num_post_linear_layers = 0
 
-    has_output_quant = len(regular_params) + 1 == len(activations)
+    has_output_quant = list(quant_state_dict.keys())[-1].endswith('.act_quant')
 
     assert len(activations) - has_output_quant == len(regular_params) == len(downsample_params), "Number of activations is not the same as the number of weight and biases"
 
@@ -95,15 +106,18 @@ def get_quant_layers(quant_state_dict: OrderedDict,
         true_weight_bit_width = get_true_weight_bit_width(weight_bit_width, slog2_weights)
 
         true_weight = slog2_to_int(weight, bit_width=true_weight_bit_width) if slog2_weights else weight
-        zero_point_correction = nn_operation(np.full(input_shape, -activations[act_keys[i]]['zero_point']), true_weight).T[0]
-        zero_corrected_biases.append(bias + zero_point_correction.astype(bias.dtype))
+        zero_point_correction = nn_operation(np.full(input_shape, activations[act_keys[i]]['zero_point'], dtype=np.int64), true_weight).flatten()
+        zero_corrected_biases.append(bias - zero_point_correction.astype(bias.dtype))
+
+        residual_path_bias = None
+        ds_scale_ratio = None
 
         if ds is not None:
             # If we need to incorporate a downsample layer
             _, ds_weight, ds_bias, _, ds_bias_scale, ds_weight_bit_width, _ = ds
 
             ds_scale_ratio = ds_bias_scale / bias_scale
-            downsample_scale_ratios.append(clog2(ds_scale_ratio))
+            scale_res.append(clog2(ds_scale_ratio))
 
             input_channels_prev = ds_weight.shape[1]
             ds_input_shape = (input_channels_prev, 1)
@@ -111,36 +125,65 @@ def get_quant_layers(quant_state_dict: OrderedDict,
             true_ds_weight_bit_width = get_true_weight_bit_width(ds_weight_bit_width, slog2_weights)
 
             ds_true_weight = slog2_to_int(ds_weight, bit_width=true_ds_weight_bit_width) if slog2_weights else ds_weight
-            ds_zero_point_correction = nn_operation(np.full(ds_input_shape, -activations[act_keys[i-1]]['zero_point']), ds_true_weight).T[0]
-            zero_corrected_biases[-1] += np.round(ds_scale_ratio * (ds_bias + ds_zero_point_correction)).astype(bias.dtype)
+            ds_zero_point_correction = nn_operation(np.full(ds_input_shape, activations[act_keys[i-1]]['zero_point'], dtype=np.int64), ds_true_weight).flatten()
+            residual_path_bias = ds_bias - ds_zero_point_correction.astype(bias.dtype)
         elif i % 2 == 1 and not is_fc:
             # If we are dealing with a residual path without a downsample layer
-            downsample_scale_ratios.append(clog2(activations[act_keys[i-1]]['scale']/bias_scale))
+            scale_res.append(clog2(activations[act_keys[i-1]]['scale']/bias_scale))
         else:
             # If we are not dealing with a downsample layer
-            downsample_scale_ratios.append(None)
+            scale_res.append(None)
 
         scale_offset = 0
 
-        if downsample_scale_ratios[-1] is not None:
+        if scale_res[-1] is not None:
             max_weight_value = 2**(2**(true_weight_bit_width-1)-1)
+
+            adjusted_w_and_b = False
 
             # Perform correction for negative downsample scales where possible
             # by adjusting the quantized weights and biases of the second convolutional
-            # block that combines with the residual path
-            while downsample_scale_ratios[-1] < 0 and true_weight.max() < max_weight_value and true_weight.min() > -max_weight_value:
+            # block that combines with the residual path. If scale_res[-1] < 0, this means
+            # that values coming from the residual path are larger than the values coming
+            # from the convolutional path. However, since Chameleon only supports left shifting
+            # inputs in the PE array
+            while scale_res[-1] < 0 and ((true_weight.max() < max_weight_value and true_weight.min() > -max_weight_value) or force_downsample_scale_compatibility):
+                adjusted_w_and_b = True
+
                 zero_corrected_biases[-1] *= 2
-                regular_params[i][1] += 1
-                scale_offset = 1
+
+                # Clipping will not actually happen as long as force_downsample_scale_compatibility is False
+                pre_clip = slog2_to_int(regular_params[i][1]) * 2
+                post_clip = np.clip(pre_clip, -max_weight_value, max_weight_value)
+
+                if not force_downsample_scale_compatibility:
+                    assert np.allclose(pre_clip, post_clip), f"Cannot adjust weights to make downsample scale compatible without overflow for layer {name} since the weights are already at the maximum value for the given bit width. Consider setting force_downsample_scale_compatibility=True to automatically adjust the weights and biases to make the scales compatible, but be aware that this may impact accuracy."
+
+                regular_params[i][1] = int_to_slog2(post_clip, true_weight_bit_width)
+                scale_offset += 1
                 true_weight *= 2
 
-                downsample_scale_ratios[-1] += 1
+                scale_res[-1] += 1
 
-            assert downsample_scale_ratios[-1] >= 0, f"Downsample scale ratio must be greater than or equal to 0 for layer {i}. If this is the case for the first layer, this is likely due to very large input values in the float domain. Try to retrain your network with smaller input values."
-            assert downsample_scale_ratios[-1] < 2**scale_bit_width, "Downsample scale ratio must be less than 2^(scale_bit_width-1)"
+            if adjusted_w_and_b:
+                print(f"Adjusted weights and biases of layer {name} to make downsample scale compatible") # , new scale_res: {scale_res[-1]}, new weight range: [{slog2_to_int(regular_params[i][1]).min()}, {slog2_to_int(regular_params[i][1]).max()}], new bias range: [{zero_corrected_biases[-1].min()}, {zero_corrected_biases[-1].max()}]")
 
-        assert zero_corrected_biases[-1].max() < 2**(bias_bit_width - 1), "Zero-corrected bias value is too large for the given bit width"
-        assert zero_corrected_biases[-1].min() >= -2**(bias_bit_width - 1), "Zero-corrected bias value is too negative for the given bit width"
+            downsample_msg = "onsider setting force_downsample_scale_compatibility=True to automatically adjust the weights and biases to make the scales compatible, but be aware that this may impact accuracy."
+            assert scale_res[-1] >= 0, f"Downsample scale ratio must be greater than or equal to 0 for layer {i}, currently {scale_res[-1]}. If this is the case for layer 1, this is likely due to very large input values in the float domain. Try to retrain your network with smaller input values. In other cases, c{downsample_msg}"
+            assert scale_res[-1] < 2**scale_bit_width, f"Downsample scale ratio must be less than 2^(scale_bit_width-1), currently {scale_res[-1]}. C{downsample_msg}"
+
+        if residual_path_bias is not None:
+            zero_corrected_biases[-1] += residual_path_bias.astype(bias.dtype) * (2**scale_res[-1])
+
+        min_allowed_bias = -2**(bias_bit_width - 1)
+        max_allowed_bias = 2**(bias_bit_width - 1) - 1
+
+        if clip_biases:
+            zero_corrected_biases[-1] = np.clip(zero_corrected_biases[-1], min_allowed_bias, max_allowed_bias)
+
+        bias_clip_msg = "). Consider setting clip_biases=True to automatically clip the biases into the allowed range, but be aware that this may impact accuracy."
+        assert zero_corrected_biases[-1].max() < max_allowed_bias + 1, f"Zero-corrected bias value is too large for the given bit width (layer {i}, max value: {zero_corrected_biases[-1].max()}, max allowed: {max_allowed_bias}{bias_clip_msg}"
+        assert zero_corrected_biases[-1].min() >= min_allowed_bias, f"Zero-corrected bias value is too negative for the given bit width (layer {i}, min value: {zero_corrected_biases[-1].min()}, min allowed: {min_allowed_bias}{bias_clip_msg}"
 
         if i == len(act_keys) - 1:
             corrected_scale = -1
@@ -158,7 +201,7 @@ def get_quant_layers(quant_state_dict: OrderedDict,
         output_corrected_scales.append(corrected_scale)
 
     regular_params_corrected = list(zip([p[1] for p in regular_params], zero_corrected_biases, output_corrected_scales))
-    downsample_params_corrected = list(zip([p[1] if p is not None else p for p in downsample_params], downsample_scale_ratios))
+    downsample_params_corrected = list(zip([p[1] if p is not None else p for p in downsample_params], scale_res))
 
     conv_params_only = regular_params_corrected
     downsample_params_only = downsample_params_corrected
@@ -192,16 +235,20 @@ def get_random_tcn(input_blocks: int,
                    conv_blocks: List[int],
                    conv_kernel_sizes: List[int],
                    linear_blocks: Optional[List[int]] = None,
-                   pe_rows: int = 16, weight_bit_width: int = 4,
-                   act_bit_width: int = 4, bias_bit_width: int = 14,
-                   scale_bit_width: int = 4, subsection_size: int = -1,
-                   force_downsample: bool = False, slog2_weights: bool = True):
+                   pe_rows: int = 16,
+                   weight_bit_width: int = 4,
+                   act_bit_width: int = 4,
+                   bias_bit_width: int = 14,
+                   scale_bit_width: int = 4,
+                   subsection_size: int = -1,
+                   force_downsample: bool = False,
+                   slog2_weights: bool = True) -> QuantLayers:
     assert len(conv_blocks) % 2 == 0, "The number of conv blocks must be even"
     assert len(conv_blocks) == len(conv_kernel_sizes), "The number of conv blocks and kernel sizes must be the same"
 
     if linear_blocks is None:
         linear_blocks = []
-    
+
     all_blocks = conv_blocks + linear_blocks
     weight_shapes = list(zip([input_blocks] + all_blocks, all_blocks, conv_kernel_sizes + [-1]*len(linear_blocks)))
 
@@ -209,21 +256,22 @@ def get_random_tcn(input_blocks: int,
         pe_rows = subsection_size
 
     max_weight_value = 2**weight_bit_width
+    max_activation_value = 2**act_bit_width
 
     weights = []
     downsample_params = []
     biases = []
 
     for input_channels, output_channels, kernel_size in weight_shapes:
-        shape = [pe_rows*output_channels, pe_rows*input_channels]
+        shape = [pe_rows * output_channels, pe_rows * input_channels]
 
         if kernel_size != -1:
             shape.append(kernel_size)
-            
+
         weight = np.random.randint(0, max_weight_value, shape)
         # Create zero biases initially as we later adjust the biases
         # to be in the same range as the output of the layers
-        bias = np.zeros(pe_rows*output_channels, dtype=int)
+        bias = np.zeros(pe_rows * output_channels, dtype=int)
 
         weights.append(weight)
         biases.append(bias)
@@ -245,11 +293,11 @@ def get_random_tcn(input_blocks: int,
         if force_downsample or in_channels != out_channels:
             identity_weight = np.random.randint(0, max_weight_value, (pe_rows*out_channels, pe_rows*in_channels, 1))
 
-            downsample_scale = random.randint(0, 2**(scale_bit_width-2)-1)
+            downsample_scale = random.randint(0, 2**(scale_bit_width - 2) - 1)
             downsample_params.append((identity_weight, downsample_scale))
         else:
-            residual_scale = random.randint(0, 2**(scale_bit_width-2)-1)
-            downsample_params.append((None, residual_scale))
+            scale_res = random.randint(0, 2**(scale_bit_width - 2) - 1)
+            downsample_params.append((None, scale_res))
 
     # Next, with the randomly initialized weights, we compute the output of the network at
     # each layer to determine scales that avoid overflow in all cases and the biases that
@@ -257,7 +305,7 @@ def get_random_tcn(input_blocks: int,
     scales = [0] * len(all_blocks)
 
     input_length = get_receptive_field_size(conv_kernel_sizes[0::2], len(conv_blocks) // 2, 2)
-    max_input_tensor = np.full((pe_rows*input_blocks, input_length), max_weight_value - 1)
+    max_input_tensor = np.full((pe_rows*input_blocks, input_length), max_activation_value - 1)
 
     layer_idx = 0
 
@@ -299,7 +347,7 @@ def get_random_tcn(input_blocks: int,
 
         scales[layer_idx] = scale
         layer_idx += 1
-    
+
     regular_params = list(zip(weights, biases, scales))
     mlp_params = [] if len(linear_blocks) == 0 else regular_params[-len(linear_blocks):]
     all_tcn_params = chunk_list(list(zip(regular_params, downsample_params)), 2) + mlp_params
@@ -356,7 +404,7 @@ def get_all_weights_and_biases(layers: QuantLayers):
     weights = []
     biases = []
 
-    for layer in layers:
+    for i, layer in enumerate(layers):
         # If we encounter a linear layer
         if len(layer) == 3:
             weight, bias, _ = layer
@@ -375,7 +423,7 @@ def get_all_weights_and_biases(layers: QuantLayers):
             if downsample_weight is not None:
                 weights.append(downsample_weight.flatten().tolist())
         else:
-            raise ValueError("Invalid layer configuration")
+            raise ValueError(f"Invalid layer configuration for layer {i}")
 
     return weights, biases
 
@@ -425,7 +473,8 @@ def get_quant_input(x: np.ndarray, quant_layers: QuantLayers, quant_in: Dict, cl
         x = x[np.newaxis, ...]
 
     if pad == 'post':
-        x = float_to_uint(x, **quant_in, clip=clip)
+        raise ValueError("Post padding is deprecated since it is not supported by the hardware and can lead to confusion. Use pre padding instead by setting pad='pre'.")
+        # x = float_to_uint(x, **quant_in, clip=clip)
 
     # If it is not bigger than one, the network is an MLP
     if rf > 1:
@@ -434,8 +483,34 @@ def get_quant_input(x: np.ndarray, quant_layers: QuantLayers, quant_in: Dict, cl
 
         if x.shape[1] < rf:
             x = np.pad(x, ((0, 0), (rf-x.shape[1], 0)), mode='constant')
-        
+        elif x.shape[1] > rf:
+            raise ValueError(f"Input length {x.shape[1]} is greater than the receptive field size {rf} of the network, which can lead to incorrect results since the network was not designed for this input length")
+
     if pad == 'pre':
         x = float_to_uint(x, **quant_in, clip=clip)
 
     return x
+
+
+def get_quant_in_and_layers(path_or_state_dict: Union[str, Path, OrderedDict],
+                                    slog2_weights: bool = True, scale_bit_width: int = 4,
+                                    accepted_layers: Optional[List[str]] = None,
+                                    clip_biases: bool = False,
+                                    force_downsample_scale_compatibility: bool = False,
+                                    in_quant: Optional[Dict] = None,
+                                    n_last_layers_to_remove: Optional[int] = None):
+
+    if isinstance(path_or_state_dict, (str, Path)):
+        quant_state_dict = load_quant_state_dict(path_or_state_dict)
+    else:
+        quant_state_dict = path_or_state_dict
+
+    quant_layers = get_quant_layers(
+        quant_state_dict, slog2_weights, scale_bit_width, accepted_layers, clip_biases, force_downsample_scale_compatibility, in_quant)
+
+    if n_last_layers_to_remove != None and n_last_layers_to_remove != 0:
+        quant_layers = quant_layers[:-n_last_layers_to_remove]
+
+    in_quant = in_quant if in_quant is not None else quant_state_dict['in_quant.act_quant']
+
+    return in_quant, quant_layers
